@@ -1,0 +1,2492 @@
+---
+output:
+  html_document:
+    toc: no
+    toc_depth: 6
+    toc_float:
+      collapsed: yes
+    fig_width: 7
+    fig_height: 6
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+<style type="text/css">
+div.main-container {
+  max-width: 2000px;
+  margin-left: 0;
+  margin-right: auto;
+}
+</style>
+
+<style>
+.tocify {
+color: black;
+}
+<!-- } -->
+<!-- .tocify .tocify-header { -->
+<!--     position: fixed; -->
+<!--     <!-- top: 50px; --> -->
+<!--     left: 50px; -->
+<!--     width: 350px; -->
+<!--     <!-- border: solid 3px black; --> -->
+<!--     <!-- height: 200px; --> -->
+<!--  border: none; -->
+<!-- } -->
+.tocify .tocify-header .active {
+color: white;
+background: #d80b8c;
+font-weight: bold;
+}
+<!-- .tocify .tocify-item { -->
+<!-- background: white; -->
+<!-- color: black; -->
+<!--  border: none; -->
+<!-- } -->
+</style>
+
+
+<style>
+  .nav-pills>li>a:hover, .nav-pills>li>a:focus, .nav-pills>li.active>a,     .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus{
+     background-color: #212070;
+     }
+</style>
+
+<style>
+.container { width: 1800px; }
+h2 {
+  background-color: #dddedd;
+  color: black;
+  text-indent: 20px;
+  <!-- font-weight: bold; -->
+}
+h3 {
+  background-color: #f2f2f2;
+  color: black;
+  text-indent: 20px;
+  <!-- font-weight: bold; -->
+}
+h4 {
+  <!-- background-color: #dddedd; -->
+  <!-- color: black; -->
+  text-indent: 50px;
+  <!-- font-weight: bold; -->
+}
+</style>
+
+<style>
+.blackbox {
+  padding: 1em;
+  background: white;
+  color: black;
+  border: 2px solid #7f7f7f;
+  width: 100%;
+  position: center;
+  align: center;
+  margin: 0px auto;
+}
+.center {
+  text-align: left;
+  margin: 0px auto;
+}
+</style>
+
+
+<!-- ```{css toc-content, echo = FALSE} -->
+<!-- #TOC { -->
+<!--   right: 270px; -->
+<!--   margin: 20px 0px 25px 0px; -->
+<!-- } -->
+
+<!-- .main-container { -->
+<!--     margin-left: 200px; -->
+<!-- } -->
+<!-- ``` -->
+
+
+```{r Load Packages, echo = FALSE, warning = FALSE, message = FALSE}
+# # Load packages -----------------------------------------------------------------------------------
+suppressMessages({
+  memory.limit(size = 8000000)
+  library(readxl)
+  library(writexl)
+  library(plyr)
+  library(dplyr)
+  library(data.table)
+  library(zoo)
+  library(shiny)
+  library(shinydashboard)
+  library(shinydashboardPlus)
+  library(shinyWidgets)
+  library(htmlwidgets)
+  library(lubridate)
+  library(tcltk)
+  library(tidyverse)
+  library(plotly)
+  library(knitr)
+  library(kableExtra)
+  library(leaflet)
+  library(grid)
+  library(gridExtra)
+  library(eeptools)
+  library(ggQC)
+  library(zipcodeR)
+  library(utils)
+  library(scales)
+  library(chron)
+  library(bupaR)
+  library(shiny)
+  library(DT)
+  library(DiagrammeR)
+  library(shinyalert)
+  library(edeaR)
+  library(processmapR)
+  library(processmonitR)
+  library(processanimateR)
+  library(tidyr)
+  library(lubridate)
+  library(RColorBrewer)
+  library(DiagrammeR)
+  library(ggplot2)
+  library(leaflet)
+  library(readr)
+  library(highcharter)
+  library(ggforce) # for 'geom_arc_bar'
+  library(packcircles) # for packed circle graph
+  library(viridis)
+  library(ggiraph)
+  library(treemapify)
+  library(treemap)
+  library(broom)
+  library(extrafont)
+  library(tis) # for US holidays
+  library(vroom)
+  library(sjmisc)
+  library(tools)
+  library(here)
+  library(shinyBS)
+  library(shinyscreenshot)
+  library(fasttime)
+  library(shinycssloaders)
+  library(feather)
+  # library(zipcodeR)
+  library(formattable)
+  library(shinyjs)
+  library(janitor)
+  library(patchwork)
+  library(flexdashboard)
+  # library(tidyverse)
+  # library(viridis)
+  # library(hrbrthemes)
+  # library(plotly)
+  # install.packages("bsts")
+  library(bsts)
+  library(reactable)
+  # install.packages("reactablefmtr")
+  library(reactablefmtr)
+  library(svDialogs)
+  # library(openxlsx)
+  library(flextable)
+  library(officedown)
+  library(officer)
+  library(magrittr)
+  library(webshot) 
+  library(png)
+  library(ggh4x)
+  library(RODBC)
+  library(DBI)
+  library(odbc)
+  library(dbplyr)
+  library(pool)
+  library(emojifont)
+})
+
+```
+
+
+```{r Graph asthetics, echo = FALSE, warning = FALSE, message = FALSE}
+### Color Functions for Graphs ============================================================
+# Mount Sinai corporate colors "USE THIS TO ADD COLORS"
+MountSinai_colors <- c(
+  `dark purple`  = "#212070",
+  `dark pink`    = "#d80b8c",
+  `dark blue`    = "#00aeef",
+  `dark grey`    = "#7f7f7f",
+  `yellow`       = "#ffc000",
+  `purple`       = "#7030a0",
+  `med purple`   = "#5753d0",
+  `med pink`     = "#f75dbe",
+  `med blue`     = "#5cd3ff",
+  `med grey`     = "#a5a7a5",
+  `light purple` = "#c7c6ef",
+  `light pink`   = "#fcc9e9",
+  `light blue`   = "#c9f0ff",
+  `light grey`   = "#dddedd"
+  )
+# Function to extract Mount Sinai colors as hex codes
+# Use Character names of MountSinai_colors
+MountSinai_cols <- function(...) {
+  cols <- c(...)
+  
+  if (is.null(cols))
+    return (MountSinai_colors)
+  
+  MountSinai_colors[cols]
+}
+# Color Function that can be used to call all colors is "MountSinai_cols()"
+# Use in ggplot 
+  #MountSinai_cols()       # will provide all colors and their hex codes in a table 
+  #MountSinai_cols("pink") # will provide color name and the hex code for the pink color
+# Create palettes 
+MountSinai_palettes <- list(
+  `all`   = MountSinai_cols("dark purple","dark pink","dark blue","dark grey",
+                            "med purple","med pink","med blue","med grey", 
+                            "light purple","light pink","light blue","light grey"),
+  
+  `main`  = MountSinai_cols("dark purple","dark pink","dark blue","dark grey"),
+  
+  `purple`  = MountSinai_cols("dark purple","med purple","light purple"),
+  
+  `pink`  = MountSinai_cols("dark pink","med pink","light pink"),
+  
+  `blue`  = MountSinai_cols("dark blue", "med blue", "light blue"),
+  
+  `grey`  = MountSinai_cols("dark grey", "med grey", "light grey"),
+  
+  `purpleGrey` = MountSinai_cols("dark purple", "dark grey"),
+  
+  `pinkBlue` = MountSinai_cols("dark pink", "dark blue")
+  
+)
+# MountSinai_palettes
+# Return function to interpolate a Mount Sinai color palette
+# default value is the main palette, reverse = True will change the order
+MountSinai_pal <- function(palette = "all", reverse = FALSE, ...) {
+  pal <- MountSinai_palettes[[palette]]
+  
+  if (reverse) pal <- rev(pal)
+  
+  colorRampPalette(pal, ...)
+}
+# Scale Function for ggplot can be used instead of scale_color_manual
+scale_color_MountSinai <- function(palette = "all", discrete = TRUE, reverse = FALSE, ...) {
+  pal <- MountSinai_pal(palette = palette, reverse = reverse)
+  
+  if (discrete) {
+    discrete_scale("colour", paste0("MountSinai_", palette), palette = pal, ...)
+  } else {
+    scale_color_gradientn(colours = pal(256), ...)
+  }
+}
+# Scale Fill for ggplot insetead of scale_fill_manual 
+scale_fill_MountSinai <- function(palette = "all", discrete = TRUE, reverse = FALSE, ...) {
+  pal <- MountSinai_pal(palette = palette, reverse = reverse)
+  if (discrete) {
+    discrete_scale("fill", paste0("MountSinai_", palette), palette = pal, ...)
+  } else {
+    scale_fill_gradientn(colours = pal(256), ...)
+  }
+}
+# Use in ggplot 
+  # scale_color_MountSinai("main")
+```
+
+
+```{r Global Variables, echo = FALSE, warning = FALSE, message = FALSE}
+
+'%!in%' <- function(x,y)!('%in%'(x,y))
+
+```
+
+
+```{r Establish Connection, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Connection to Oracle DB ------------------------------------------------------
+conn1 <- dbPool(drv = odbc(), dsn = "OAO Cloud DB SoYoun", timeout = 30)
+conn2 <- dbConnect(odbc(), 
+                  "Clarity_prod", 
+                  uid = "kweons01" , 
+                  pwd = "kweons01123$")
+
+
+# Connection to Clarity Tables -------------------------------------------------
+slot_raw_tbl <- tbl(conn2, "Y_DM_BOOKED_FILLED_RATE")
+access_raw_tbl <- tbl(conn2, "MV_DM_PATIENT_ACCESS")
+availability_raw_tbl <- tbl(conn2, "V_AVAILABILITY")
+block_raw_tbl <- tbl(conn2, "AVAIL_BLOCK")
+block_name_tbl <- tbl(conn2, "ZC_APPT_BLOCK")
+orders_raw_tbl <- tbl(conn2, "ORDER_PROC")
+coverage_tbl <- tbl(conn2, "V_PAT_ENC_COVERAGE")
+encounters_tbl <- tbl(conn2, "PAT_ENC")
+myChart_tbl <- tbl(conn2, "V_MYC_MESG")
+inBasket_tbl <- tbl(conn2, "IB_MESSAGES")
+template_tbl <- tbl(conn2, "TEMPLATE")
+user_activity_hour_tbl <- tbl(conn2, "UAL_ACTIVITY_HOURS") # User Activity Summary by Hour
+user_login_activity_tbl <- tbl(conn2, "V_ACCESS_LOG") # User Log In/Out Time
+user_access_log_tbl <- tbl(conn2, "ACCESS_LOG")
+clarity_ser_tbl <- tbl(conn2, "CLARITY_SER") # Physician Titles
+clarity_lws_tbl <- tbl(conn2, "CLARITY_LWS") # Workstation-Room Mapping
+
+# Connection to OAO Tables -----------------------------------------------------
+utilization_tbl <-  tbl(conn1, in_schema("VILLEA04", "UTILIZATION_VIEW"))
+
+```
+
+
+```{r}
+
+workstation <- clarity_lws_tbl %>%
+  filter(WORKSTN_IDENTIFIER == "W10383DCT9P753") %>%
+  collect()
+
+user_activity_hour <- user_activity_hour_tbl %>%
+  head(10) %>%
+  # filter(WORKSTATION_ID == "W10383DCT9P753") %>%
+  collect()
+
+user_access_log <- user_login_activity_tbl %>%
+  filter(DEPARTMENT_ID == 8001090) %>%
+  # filter(WORKSTATION_ID == "W10383DCT6S753") %>%
+  collect()
+
+clarity_ser_data <- clarity_ser_tbl %>%
+  head(10) %>%
+  collect()
+
+```
+
+
+```{r Report Variables, echo = FALSE, warning = FALSE, message = FALSE}
+
+day_order <- c("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
+hour_order <- as.vector(seq(7,20))
+visit_capacity_order <- c(paste0("visit_capacity_",4:10))
+
+report_run_date <- Sys.Date()
+
+```
+
+
+```{r 5E98 Preop Processing, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Workstations currently mapped to 4 exsam rooms at 5 E 98 Preop 
+## To be replaced by the actual joining of the workstaion mapping table in Clarity 
+workstations <- c("942", "944", "1301", "1321")
+workstaions_names <- c("W10383DCT6S753", "W10383DCT9P753", "W10383D7Y79KB2", "W10383DCT5T753")
+
+dept_mapping <- access_raw_tbl %>% 
+  group_by(DEPARTMENT_ID, DEPARTMENT_NAME, SITE) %>%
+  summarise(total = n()) %>%
+  collect()
+
+
+
+workstation_mapping <- clarity_lws_tbl %>%
+  collect()
+
+# 1. Merge User Activity by Hour & Scheduling Data -----------------------------
+user_activity_hour_test <- user_activity_hour_tbl %>%
+  # filter(WORKSTATION_ID %in% workstations) %>%
+  filter(PAT_ENC_CSN_ID == 100137922892) %>%
+  left_join(clarity_lws_tbl %>% 
+              # filter(WORKSTATION_ID %in% workstations) %>%
+              dplyr::select(WORKSTATION_ID, ROOM_IDENTIFIER, PRIM_DEPARTMENT_ID),
+            by = c("WORKSTATION_ID")) %>%
+  filter(!is.na(PRIM_DEPARTMENT_ID)) %>%
+  left_join(access_raw_tbl %>% 
+              group_by(DEPARTMENT_ID, DEPARTMENT_NAME, SITE) %>%
+              summarise(total = n()) %>%
+              dplyr::select(-total),
+            by = c("PRIM_DEPARTMENT_ID" = "DEPARTMENT_ID")) %>%
+  filter(SITE == "MSUS") %>%
+  rename("PRIM_DEPARTMENT_NAME" = "DEPARTMENT_NAME",
+         "PRIM_SITE" = "SITE")
+
+user_activity_hour_test <- user_activity_hour_test %>%
+  left_join(clarity_ser_tbl %>%
+              dplyr::select(USER_ID, PROV_ID, PROV_NAME, PROV_TYPE, STAFF_RESOURCE, CLINICIAN_TITLE),
+            by = c("USER_ID")) 
+
+user_activity_hour_test <- user_activity_hour_test %>%
+  left_join(access_raw_tbl %>%
+              dplyr::select(PAT_ENC_CSN_ID, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, 
+                            SITE, DEPT_SPECIALTY_NAME, LOC_NAME,
+                            CONTACT_DATE, DERIVED_STATUS_DESC,
+                            ROOMED_DTTM, VISIT_END_DTTM, CHECKOUT_DTTM, CYCLE_TIME_MINUTES, TIME_IN_ROOM_MINUTES,
+                            MRN, APPT_DTTM),
+            by = c("PAT_ENC_CSN_ID"))
+
+user_activity_hour_test <- user_activity_hour_test %>%
+  mutate(activity_year = year(ACTIVITY_HOUR_DTTM),
+         activity_month = month(ACTIVITY_HOUR_DTTM),
+         activity_date = TO_DATE(ACTIVITY_HOUR_DTTM)) %>%
+  filter(activity_year == 2023) %>%
+  filter(activity_month >= 10) %>%
+  collect() %>%
+  mutate(activity_day = format(activity_date, "%a"),
+         activity_yearmonth = format(activity_date, "%Y-%m"))
+
+
+
+
+depts_include <- c("10 UNION SQ E PRIMARY CARE",
+                   "10 UNION SQ E COVID 19 COE",
+                   "10 UNION SQ E ENDOCRINOLOGY",
+                   "10 UNION SQ GASTROENTEROLOGY",
+                   "10 UNION SQ NEPHROLOGY",
+                   "10 UNION SQ RHEUMATOLOGY",
+                   "UNION SQ ENDO THYROID INS")
+
+user_activity_hour_output <- user_activity_hour_test %>%
+  filter(PRIM_DEPARTMENT_NAME %in% depts_include)
+
+library(writexl)
+write_xlsx(user_activity_hour_output, paste0("EPIC User Activity Validation.xlsx"))
+write_xlsx(workstation_mapping, paste0("workstation_mapping.xlsx"))
+write_xlsx(user_activity_hour_test, paste0("Primary Care 100137922892.xlsx"))
+
+user_activity_hour_test <- user_activity_hour_test %>%
+  mutate(dept_group = paste0(SITE," ",DEPT_SPECIALTY_NAME)) %>%
+  mutate(activity_hour = format(strptime(ACTIVITY_HOUR_DTTM, "%Y-%m-%d %H:%M:%S"), "%H")) %>%
+  mutate(roomed_hour = format(strptime(ROOMED_DTTM, "%Y-%m-%d %H:%M:%S"), "%H"))
+
+# 2. Indiciate Relevant Visits (Access Date = Visit Date) ----------------------
+user_activity_hour_test <- user_activity_hour_test %>%
+  mutate(relevant_visit = ifelse(CONTACT_DATE == activity_date, "Yes", "No"))
+
+
+## Temporary workstation-facility-floor mapping
+user_activity_hour_test$workstation_loc <- "5 E 98TH ST"
+user_activity_hour_test$workstation_floor <- "Floor 11"
+  
+
+```
+
+
+```{r EPIC Timestamp Validation, echo = FALSE, warning = FALSE, message = FALSE}
+
+epic_timestamps <- access_raw_tbl %>%
+  mutate(appt_year = year(CONTACT_DATE)) %>%
+  filter(appt_year >= 2023) %>%
+  filter(DERIVED_STATUS_DESC == "Arrived") %>%
+  dplyr::select(SITE, DEPARTMENT_NAME, PAT_ENC_CSN_ID, ROOMED_DTTM, VISIT_END_DTTM, CHECKOUT_DTTM) %>%
+  collect()
+  
+
+epic_timestamps <- epic_timestamps %>%
+  mutate(category = case_when(is.na(ROOMED_DTTM) & (is.na(VISIT_END_DTTM) | is.na(CHECKOUT_DTTM)) ~ "All Missing",
+                              is.na(VISIT_END_DTTM) & is.na(CHECKOUT_DTTM) ~ "Missing End",
+                              is.na(ROOMED_DTTM) ~ "Missing Start",
+                              TRUE ~ "Complete"))
+
+epic_timestamps_validation <- epic_timestamps %>%
+  group_by(SITE, DEPARTMENT_NAME, category) %>%
+  summarise(total = n()) %>%
+  pivot_wider(names_from = category,
+              values_from = total,
+              values_fill = 0) %>%
+  mutate(total = rowSums(across(where(is.numeric)))) %>%
+  mutate(all_missing_perc = round(`All Missing`/total,2))
+
+require(openxlsx)
+write.xlsx(epic_timestamps_validation, "EPIC Timestamps Validation.xlsx")
+
+
+```
+
+
+
+```{r Sinai Logo, echo=FALSE, out.width = '15%'}
+knitr::include_graphics("Mount_Sinai_Logo_H.png")
+```
+
+
+# Room Usage Dashboard (PROTOTYPE - 5 E 98 PreOp) 
+*Report run date: `r report_run_date`*<br/>
+______________________________________________________________________________________________________________________________
+<br/>
+
+
+## MSHS Overview
+
+
+## Facility
+### 5 E 98th St
+```{r Facility - Avg Visits Target Comparison Function, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Facility Avg Visit Count Target Comparison Table --------------------------------------
+avg_visits_target_comparison_function_facility <- function(location){
+  
+  # Avg visits by floor ========================================================
+  # Calculate average visit count by room by month 
+  avg_visits_target <- user_activity_hour_test %>%
+    filter(workstation_loc == location) %>%
+    filter(relevant_visit == "Yes") %>%
+    filter(DERIVED_STATUS_DESC == "Arrived") %>%
+    group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>%
+    slice(which.max(ROOMED_DTTM)) %>%
+    group_by(workstation_loc, workstation_floor) %>%
+    mutate(exam_rooms = length(unique(ROOM_IDENTIFIER))) %>%
+    group_by(workstation_loc, workstation_floor, exam_rooms, activity_date) %>%
+    summarise(total_visits = n()) %>%
+    pivot_wider(names_from = activity_date,
+                values_from = total_visits,
+                values_fill = 0)
+  
+  # Fill in any dates with no visits to be accounted for avg visit count
+  avg_visits_target <- avg_visits_target %>%
+    pivot_longer(4:length(avg_visits_target),
+                 names_to = "activity_date",
+                 values_to = "total_visits") %>%
+    mutate(activity_yearmonth = format(as.Date(activity_date), "%Y-%m")) %>%
+    group_by(workstation_loc, workstation_floor, exam_rooms, activity_yearmonth) %>%
+    summarise(avg_visits_day = mean(total_visits)) %>%
+    ungroup() %>%
+    mutate(avg_visits_day = round(avg_visits_day/exam_rooms,2))
+  
+  # Format table output 
+  avg_visits_target <- avg_visits_target %>%
+    pivot_wider(names_from = activity_yearmonth,
+                values_from = avg_visits_day,
+                values_fill = 0) %>%
+    mutate(exam_room_count = exam_rooms) %>%
+    dplyr::select(-exam_rooms) %>%
+    add_column(`FY22 Baseline`  = NA,
+               .after = "workstation_floor") %>%
+    add_column(`FY23 YTD`  = NA,
+               .before = "exam_room_count") %>%
+    add_column(`Target`  = NA,
+               .before = "exam_room_count") %>%
+    ungroup() %>%
+    mutate(`FY22 Baseline` = round(rowMeans(dplyr::select(.,
+                                      starts_with('2022')), na.rm = TRUE),2)) %>%
+    mutate(`FY23 YTD` = round(rowMeans(dplyr::select(.,
+                                      starts_with('2023')), na.rm = TRUE),2),
+           Target = round(`FY23 YTD`*1.05,2))
+  
+  
+  
+  # Avg visits by Facility =====================================================
+  # Calculate average visit count by room by month 
+  avg_visits_target_facility <- user_activity_hour_test %>%
+    filter(workstation_loc == location) %>%
+    filter(relevant_visit == "Yes") %>%
+    filter(DERIVED_STATUS_DESC == "Arrived") %>%
+    group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>%
+    slice(which.max(ROOMED_DTTM)) %>%
+    group_by(workstation_loc, workstation_floor) %>%
+    mutate(exam_rooms = length(unique(paste0(workstation_floor, ROOM_IDENTIFIER)))) %>%
+    group_by(workstation_loc, exam_rooms, activity_date) %>%
+    summarise(total_visits = n()) %>%
+    pivot_wider(names_from = activity_date,
+                values_from = total_visits,
+                values_fill = 0)
+  
+  # Fill in any dates with no visits to be accounted for avg visit count
+  avg_visits_target_facility <- avg_visits_target_facility %>%
+    pivot_longer(3:length(avg_visits_target_facility),
+                 names_to = "activity_date",
+                 values_to = "total_visits") %>%
+    mutate(activity_yearmonth = format(as.Date(activity_date), "%Y-%m")) %>%
+    group_by(workstation_loc, exam_rooms, activity_yearmonth) %>%
+    summarise(avg_visits_day = mean(total_visits)) %>%
+    ungroup() %>%
+    mutate(avg_visits_day = round(avg_visits_day/exam_rooms,2))
+  
+  # Format table output 
+  avg_visits_target_facility <- avg_visits_target_facility %>%
+    pivot_wider(names_from = activity_yearmonth,
+                values_from = avg_visits_day,
+                values_fill = 0) %>%
+    mutate(exam_room_count = exam_rooms) %>%
+    dplyr::select(-exam_rooms) %>%
+    add_column(`workstation_floor`  = NA,
+               .after = "workstation_loc") %>%
+    add_column(`FY22 Baseline`  = NA,
+               .after = "workstation_floor") %>%
+    add_column(`FY23 YTD`  = NA,
+               .before = "exam_room_count") %>%
+    add_column(`Target`  = NA,
+               .before = "exam_room_count") %>%
+    ungroup() %>%
+    mutate(workstation_loc = paste0(workstation_loc, " Total"),
+           workstation_floor = "Total",
+           `FY22 Baseline` = round(rowMeans(dplyr::select(.,
+                                      starts_with('2022')), na.rm = TRUE),2)) %>%
+    mutate(`FY23 YTD` = round(rowMeans(dplyr::select(.,
+                                      starts_with('2023')), na.rm = TRUE),2),
+           Target = round(`FY23 YTD`*1.05,2)) 
+  
+  
+  avg_visits_target_merged <- bind_rows(avg_visits_target_facility, avg_visits_target)
+  
+  return(avg_visits_target_merged)
+}
+```
+
+```{r Facility - Avg Visits Target Comparison Output, echo = FALSE, warning = FALSE, message = FALSE}
+
+location <- "5 E 98TH ST"
+
+# Facility Avg Visit Count Target Comparison Table --------------------------------------
+reactable(
+  avg_visits_target_comparison_function_facility(location),
+
+  # elementId = "year-month-filter-table",
+  
+  style = list(fontFamily = 'Calibri',
+                 fontSize = '14px'),
+    defaultColDef = colDef(align = "left",
+                           maxWidth = 70,
+                           headerStyle = list(background = "#7f7f7f", color = "white", fontWeight = "Bold", fontSize = "14px"),
+                           # headerStyle = list(fontWeight = "Bold", fontSize = "14px"),
+                           headerClass = "bar-sort-header"),
+
+  highlight = TRUE,
+  # filterable = TRUE,
+  pagination = FALSE,
+  # height = 700,
+  wrap = TRUE,
+  searchable = TRUE,
+
+  # rowStyle = JS("function(rowInfo) {
+  #   if (rowInfo.level == 1) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #212070'}
+  #   } if (rowInfo.level == 2) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #d80b8c'}
+  #   } if (rowInfo.level == 2) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #00aeef'}
+  #   } else {
+  #     return { borderLeft: '2px solid transparent'}
+  #   }
+  # }"),
+  
+  rowStyle = function(index) {
+            if (index == 1) list(`border-top` = "2px solid rgb(184,184,184)",
+                                 # background = "#F0F0F0", 
+                                 fontWeight = "Bold")
+          },
+
+  # groupBy = c("workstation_loc", "workstation_floor"),
+
+  columns = list(
+    
+    workstation_loc = colDef(
+      # footer = "Total",
+      name = "Facility",
+      maxWidth = 120,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    workstation_floor = colDef(
+      # footer = "Total",
+      name = "Floor/Suite",
+      maxWidth = 90,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+    
+    `FY22 Baseline` = colDef(
+      # footer = "Total",
+      # name = "Target",
+      # maxWidth = 100,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      style = list(background = "#fcc9e9", fontWeight = "Bold", borderRight = "1.5px solid rgb(230, 230, 230)")),
+    
+    `FY23 YTD` = colDef(
+      # footer = "Total",
+      # name = "Target",
+      # maxWidth = 100,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      style = list(background = "#fcc9e9", fontWeight = "Bold",  borderLeft = "1.5px solid rgb(230, 230, 230)")),
+    
+    Target = colDef(
+      # footer = "Total",
+      name = "Target (+5%)",
+      maxWidth = 100,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      style = list(background = "#fcc9e9", fontWeight = "Bold", borderLeft = "1.5px solid rgb(230, 230, 230)",
+                   borderRight = "1.5px solid rgb(230, 230, 230)")),
+    
+    exam_room_count = colDef(
+      # footer = "Total",
+      name = "Exam Rooms",
+      maxWidth = 100)
+
+  ) # Close Columns
+
+  ) # Close Reactable
+
+```
+<br/>
+
+```{r Facility - Avg Visits Target Comparison Function, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Facility Avg Visit Count Target Comparison Table --------------------------------------
+avg_visits_target_comparison_function_facility <- function(location){
+  
+  # Avg visits by floor ========================================================
+  # Calculate average visit count by room by month 
+  avg_visits_target <- user_activity_hour_test %>%
+    filter(workstation_loc == location) %>%
+    filter(relevant_visit == "Yes") %>%
+    filter(DERIVED_STATUS_DESC == "Arrived") %>%
+    group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>%
+    slice(which.max(ROOMED_DTTM)) %>%
+    group_by(workstation_loc, workstation_floor, ROOM_IDENTIFIER) %>%
+    mutate(exam_room_single = 1,
+           exam_rooms = length(unique(ROOM_IDENTIFIER))) %>%
+    group_by(workstation_loc, workstation_floor, exam_rooms, exam_room_single, activity_date) %>%
+    summarise(total_visits = n()) %>%
+    pivot_wider(names_from = activity_date,
+                values_from = total_visits,
+                values_fill = 0)
+  
+  # Fill in any dates with no visits to be accounted for avg visit count
+  avg_visits_target <- avg_visits_target %>%
+    pivot_longer(5:length(avg_visits_target),
+                 names_to = "activity_date",
+                 values_to = "total_visits") %>%
+    mutate(activity_yearmonth = format(as.Date(activity_date), "%Y-%m"),
+           activity_year = format(as.Date(activity_date), "%Y")) %>%
+    group_by(activity_year) %>%
+    mutate(total_year_days = length(unique(activity_date))) %>%
+    group_by(activity_yearmonth) %>%
+    mutate(total_month_days = )
+    group_by(workstation_loc, workstation_floor, exam_rooms, exam_room_single,
+             activity_year, activity_yearmonth, ) %>%
+    summarise(avg_visits_day = mean(total_visits)) %>%
+    ungroup() %>%
+    mutate(avg_visits_day = round(avg_visits_day/exam_rooms,2))
+  
+  # Format table output 
+  avg_visits_target <- avg_visits_target %>%
+    pivot_wider(names_from = activity_yearmonth,
+                values_from = avg_visits_day,
+                values_fill = 0) %>%
+    mutate(exam_room_count = exam_rooms) %>%
+    dplyr::select(-exam_rooms) %>%
+    add_column(`FY22 Baseline`  = NA,
+               .after = "workstation_floor") %>%
+    add_column(`FY23 YTD`  = NA,
+               .before = "exam_room_count") %>%
+    add_column(`Target`  = NA,
+               .before = "exam_room_count") %>%
+    ungroup() %>%
+    mutate(`FY22 Baseline` = round(rowMeans(dplyr::select(.,
+                                      starts_with('2022')), na.rm = TRUE),2)) %>%
+    mutate(`FY23 YTD` = round(rowMeans(dplyr::select(.,
+                                      starts_with('2023')), na.rm = TRUE),2),
+           Target = round(`FY23 YTD`*1.05,2))
+  
+  
+  
+  # Avg visits by Facility =====================================================
+  # Calculate average visit count by room by month 
+  avg_visits_target_facility <- user_activity_hour_test %>%
+    filter(workstation_loc == location) %>%
+    filter(relevant_visit == "Yes") %>%
+    filter(DERIVED_STATUS_DESC == "Arrived") %>%
+    group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>%
+    slice(which.max(ROOMED_DTTM)) %>%
+    group_by(workstation_loc, workstation_floor) %>%
+    mutate(exam_rooms = length(unique(paste0(workstation_floor, ROOM_IDENTIFIER)))) %>%
+    group_by(workstation_loc, exam_rooms, activity_date) %>%
+    summarise(total_visits = n()) %>%
+    pivot_wider(names_from = activity_date,
+                values_from = total_visits,
+                values_fill = 0)
+  
+  # Fill in any dates with no visits to be accounted for avg visit count
+  avg_visits_target_facility <- avg_visits_target_facility %>%
+    pivot_longer(3:length(avg_visits_target_facility),
+                 names_to = "activity_date",
+                 values_to = "total_visits") %>%
+    mutate(activity_yearmonth = format(as.Date(activity_date), "%Y-%m")) %>%
+    group_by(workstation_loc, exam_rooms, activity_yearmonth) %>%
+    summarise(avg_visits_day = mean(total_visits)) %>%
+    ungroup() %>%
+    mutate(avg_visits_day = round(avg_visits_day/exam_rooms,2))
+  
+  # Format table output 
+  avg_visits_target_facility <- avg_visits_target_facility %>%
+    pivot_wider(names_from = activity_yearmonth,
+                values_from = avg_visits_day,
+                values_fill = 0) %>%
+    mutate(exam_room_count = exam_rooms) %>%
+    dplyr::select(-exam_rooms) %>%
+    add_column(`workstation_floor`  = NA,
+               .after = "workstation_loc") %>%
+    add_column(`FY22 Baseline`  = NA,
+               .after = "workstation_floor") %>%
+    add_column(`FY23 YTD`  = NA,
+               .before = "exam_room_count") %>%
+    add_column(`Target`  = NA,
+               .before = "exam_room_count") %>%
+    ungroup() %>%
+    mutate(workstation_loc = paste0(workstation_loc, " Total"),
+           workstation_floor = "Total",
+           `FY22 Baseline` = round(rowMeans(dplyr::select(.,
+                                      starts_with('2022')), na.rm = TRUE),2)) %>%
+    mutate(`FY23 YTD` = round(rowMeans(dplyr::select(.,
+                                      starts_with('2023')), na.rm = TRUE),2),
+           Target = round(`FY23 YTD`*1.05,2)) 
+  
+  
+  avg_visits_target_merged <- bind_rows(avg_visits_target_facility, avg_visits_target)
+  
+  return(avg_visits_target_merged)
+}
+```
+
+
+```{r Facility - % Days by Visit Capacity Function, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Facility % of Days under Capacity --------------------------------------------
+visit_capacity_perc_days_function_facility <- function(location){
+  
+  # Avg visits by floor ========================================================
+  # Calculate average visit count by room by month 
+  visit_capacity <- user_activity_hour_test %>%
+    filter(workstation_loc == location) %>%
+    filter(relevant_visit == "Yes") %>%
+    filter(DERIVED_STATUS_DESC == "Arrived") %>%
+    group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>%
+    slice(which.max(ROOMED_DTTM)) %>%
+    group_by(workstation_loc, workstation_floor) %>%
+    mutate(exam_rooms = length(unique(ROOM_IDENTIFIER))) %>%
+    group_by(workstation_loc, workstation_floor, exam_rooms, activity_date) %>%
+    summarise(total_visits = n()) %>%
+    pivot_wider(names_from = activity_date,
+                values_from = total_visits,
+                values_fill = 0)
+  
+  # Fill in any dates with no visits to be accounted for avg visit count
+  visit_capacity <- visit_capacity %>%
+    pivot_longer(4:length(visit_capacity),
+                 names_to = "activity_date",
+                 values_to = "total_visits") %>%
+    mutate(total_days = length(unique(activity_date))) %>%
+    group_by(workstation_floor) %>%
+    mutate(avg_visits_room = round(mean(total_visits)/exam_rooms,2)) %>%
+    ungroup() %>%
+    mutate(visit_capacity_4 = ifelse(total_visits/exam_rooms < 4, 1,0),
+           visit_capacity_5 = ifelse(total_visits/exam_rooms < 5, 1,0),
+           visit_capacity_6 = ifelse(total_visits/exam_rooms < 6, 1,0),
+           visit_capacity_7 = ifelse(total_visits/exam_rooms < 7, 1,0),
+           visit_capacity_8 = ifelse(total_visits/exam_rooms < 8, 1,0),
+           visit_capacity_9 = ifelse(total_visits/exam_rooms < 9, 1,0),
+           visit_capacity_10 = ifelse(total_visits/exam_rooms < 10, 1,0)) %>%
+    pivot_longer(8:14,
+                 names_to = "visit_capacity",
+                 values_to = "range") %>%
+    ungroup() %>%
+    group_by(workstation_loc, workstation_floor, avg_visits_room, exam_rooms, total_days, visit_capacity) %>%
+    summarise(range = sum(range)) %>%
+    arrange(factor(visit_capacity, levels = visit_capacity_order)) %>%
+    ungroup() %>%
+    dplyr::select(workstation_loc, workstation_floor, exam_rooms, avg_visits_room, total_days, visit_capacity, range) %>%
+    mutate(perc_days_range = round(range/total_days,2)) %>%
+    pivot_wider(names_from = visit_capacity,
+                 values_from = range:perc_days_range)
+  
+  # Avg visits by facility ========================================================
+  # Calculate average visit count by room by month 
+  visit_capacity_facility <- user_activity_hour_test %>%
+    filter(workstation_loc == location) %>%
+    filter(relevant_visit == "Yes") %>%
+    filter(DERIVED_STATUS_DESC == "Arrived") %>%
+    group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>%
+    slice(which.max(ROOMED_DTTM)) %>%
+    group_by(workstation_loc) %>%
+    mutate(exam_rooms = length(unique(ROOM_IDENTIFIER))) %>%
+    group_by(workstation_loc, exam_rooms, activity_date) %>%
+    summarise(total_visits = n()) %>%
+    pivot_wider(names_from = activity_date,
+                values_from = total_visits,
+                values_fill = 0)
+  
+  # Fill in any dates with no visits to be accounted for avg visit count
+  visit_capacity_facility <- visit_capacity_facility %>%
+    pivot_longer(3:length(visit_capacity_facility),
+                 names_to = "activity_date",
+                 values_to = "total_visits") %>%
+    mutate(total_days = length(unique(activity_date))) %>%
+    group_by(workstation_loc) %>%
+    mutate(avg_visits_room = round(mean(total_visits)/exam_rooms,2)) %>%
+    ungroup() %>%
+    mutate(visit_capacity_4 = ifelse(total_visits/exam_rooms < 4, 1,0),
+           visit_capacity_5 = ifelse(total_visits/exam_rooms < 5, 1,0),
+           visit_capacity_6 = ifelse(total_visits/exam_rooms < 6, 1,0),
+           visit_capacity_7 = ifelse(total_visits/exam_rooms < 7, 1,0),
+           visit_capacity_8 = ifelse(total_visits/exam_rooms < 8, 1,0),
+           visit_capacity_9 = ifelse(total_visits/exam_rooms < 9, 1,0),
+           visit_capacity_10 = ifelse(total_visits/exam_rooms < 10, 1,0)) %>%
+    pivot_longer(7:13,
+                 names_to = "visit_capacity",
+                 values_to = "range") %>%
+    ungroup() %>%
+    group_by(workstation_loc, avg_visits_room, exam_rooms, total_days, visit_capacity) %>%
+    summarise(range = sum(range)) %>%
+    arrange(factor(visit_capacity, levels = visit_capacity_order)) %>%
+    ungroup() %>%
+    mutate(workstation_loc = paste0(workstation_loc, " Total"),
+           workstation_floor = "Total") %>%
+    dplyr::select(workstation_loc, workstation_floor, exam_rooms, avg_visits_room, total_days, visit_capacity, range) %>%
+    mutate(perc_days_range = round(range/total_days,2)) %>%
+    pivot_wider(names_from = visit_capacity,
+                 values_from = range:perc_days_range)
+    
+    
+  
+  visit_capacity_merged <- bind_rows(visit_capacity_facility, visit_capacity)
+  
+  return(visit_capacity_merged)
+}
+
+```
+
+```{r Facility - % Days by Visit Capacity Output, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Facility Avg Visit Count Target Comparison Table --------------------------------------
+reactable(
+  visit_capacity_perc_days_function_facility(location),
+
+  # elementId = "year-month-filter-table",
+  
+  style = list(fontFamily = 'Calibri',
+                 fontSize = '14px'),
+    defaultColDef = colDef(align = "left",
+                           headerStyle = list(background = "#7f7f7f", color = "white", fontWeight = "Bold", fontSize = "14px"),
+                           # headerStyle = list(fontWeight = "Bold", fontSize = "14px"),
+                           headerClass = "bar-sort-header"),
+
+  highlight = TRUE,
+  # filterable = TRUE,
+  pagination = FALSE,
+  # height = 700,
+  wrap = TRUE,
+  searchable = TRUE,
+
+  # rowStyle = JS("function(rowInfo) {
+  #   if (rowInfo.level == 1) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #212070'}
+  #   } if (rowInfo.level == 2) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #d80b8c'}
+  #   } if (rowInfo.level == 2) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #00aeef'}
+  #   } else {
+  #     return { borderLeft: '2px solid transparent'}
+  #   }
+  # }"),
+  
+  rowStyle = function(index) {
+            if (index == 1) list(`border-top` = "2px solid rgb(184,184,184)", 
+                                 background = "#F0F0F0", fontWeight = "Bold")
+          },
+
+  # groupBy = c("workstation_loc", "workstation_floor"),
+  
+ columnGroups = list(
+   colGroup(name = "",
+            columns = c("workstation_loc","workstation_floor","exam_rooms","avg_visits_room"), sticky = "left",
+            headerStyle = list(fontSize = "16px")),
+   colGroup(name = "% of Days BELOW Visits/Room/Day Capacity",
+            columns = c("perc_days_range_visit_capacity_4","perc_days_range_visit_capacity_5","perc_days_range_visit_capacity_6",
+                        "perc_days_range_visit_capacity_7","perc_days_range_visit_capacity_8","perc_days_range_visit_capacity_9",
+                        "perc_days_range_visit_capacity_10"),
+            headerStyle = list(color = "#7f7f7f", fontSize = "18px", align = "center"))
+   ),
+
+  columns = list(
+    
+    workstation_loc = colDef(
+      # footer = "Total",
+      name = "Facility",
+      minWidth = 200,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    workstation_floor = colDef(
+      # footer = "Total",
+      name = "Floor/Suite",
+      minWidth = 150,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    exam_rooms = colDef(
+      # footer = "Total",
+      name = "Exam Rooms",
+      maxWidth = 150,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+    
+    `avg_visits_room` = colDef(
+      # footer = "Total",
+      name = "Avg Visits per Room",
+      maxWidth = 150,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+    
+    perc_days_range_visit_capacity_4 = colDef(
+      # footer = "Total",
+      name = "4 Visits/Room/Day",
+      maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    perc_days_range_visit_capacity_5 = colDef(
+      # footer = "Total",
+      name = "5 Visits/Room/Day",
+      maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    perc_days_range_visit_capacity_6 = colDef(
+      # footer = "Total",
+      name = "6 Visits/Room/Day",
+      maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    perc_days_range_visit_capacity_7 = colDef(
+      # footer = "Total",
+      name = "7 Visits/Room/Day",
+      maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    perc_days_range_visit_capacity_8 = colDef(
+      # footer = "Total",
+      name = "8 Visits/Room/Day",
+      maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    perc_days_range_visit_capacity_9 = colDef(
+      # footer = "Total",
+      name = "9 Visits/Room/Day",
+      maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    perc_days_range_visit_capacity_10 = colDef(
+      # footer = "Total",
+      name = "10 Visits/Room/Day",
+      maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    total_days = colDef(show = F),
+    range_visit_capacity_4 = colDef(show = F),
+    range_visit_capacity_5 = colDef(show = F),
+    range_visit_capacity_6 = colDef(show = F),
+    range_visit_capacity_7 = colDef(show = F),
+    range_visit_capacity_8 = colDef(show = F),
+    range_visit_capacity_9 = colDef(show = F),
+    range_visit_capacity_10 = colDef(show = F)
+
+  ) # Close Columns
+
+  ) # Close Reactable
+
+```
+<br/>
+
+
+```{r Facility - % Days by Visit Count Function, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Facility % of Days under Capacity --------------------------------------------
+visit_count_perc_days_function_facility <- function(location){
+  
+  # Avg visits by floor ========================================================
+  # Calculate average visit count by room by month 
+  visit_count_capacity <- user_activity_hour_test %>%
+    filter(workstation_loc == location) %>%
+    filter(relevant_visit == "Yes") %>%
+    filter(DERIVED_STATUS_DESC == "Arrived") %>%
+    group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>%
+    slice(which.max(ROOMED_DTTM)) %>%
+    group_by(workstation_loc, workstation_floor) %>%
+    mutate(exam_rooms = length(unique(ROOM_IDENTIFIER))) %>%
+    group_by(workstation_loc, workstation_floor, exam_rooms, activity_date) %>%
+    summarise(total_visits = n()) %>%
+    pivot_wider(names_from = activity_date,
+                values_from = total_visits,
+                values_fill = 0)
+  
+  # Fill in any dates with no visits to be accounted for avg visit count
+  visit_count_capacity <- visit_count_capacity %>%
+    pivot_longer(4:length(visit_count_capacity),
+                 names_to = "activity_date",
+                 values_to = "total_visits") %>%
+    mutate(total_days = length(unique(activity_date)),
+           avg_visits = round(total_visits/exam_rooms,2)) %>%
+    mutate(avg_visits_group = case_when(avg_visits <2 ~ "[0,2)",
+                                        avg_visits >=2 & avg_visits <4 ~ "[2,4)",
+                                        avg_visits >=4 & avg_visits <6 ~ "[4,6)",
+                                        avg_visits >=6 & avg_visits <8 ~ "[6,8)",
+                                        avg_visits >= 8 & avg_visits <10 ~ "[8,10)",
+                                        avg_visits >=10 ~ ">=10")) %>%
+    group_by(workstation_loc, workstation_floor, exam_rooms, total_days, avg_visits_group) %>%
+    summarise(day_count = n()) %>%
+    mutate(perc_days = round(day_count/total_days,2)) %>%
+    pivot_wider(names_from = avg_visits_group,
+                values_from = c("day_count","perc_days"),
+                values_fill = 0)
+  
+  Missing <- setdiff(c("workstation_loc", "workstation_floor", "exam_rooms", 
+                       "day_count_[0,2)", "day_count_[2,4)", "day_count_[4,6)", "day_count_[6,8)", "day_count_[8,10)", "day_count_>=10",
+                       "perc_days_[0,2)", "perc_days_[2,4)", "perc_days_[4,6)", "perc_days_[6,8)", "perc_days_[8,10)", "perc_days_>=10"),
+                     names(visit_count_capacity))  # Find names of missing columns
+  visit_count_capacity[Missing] <- 0                    # Add them, filled with '0'
+  visit_count_capacity <- visit_count_capacity[c("workstation_loc", "workstation_floor", "exam_rooms", 
+                       "day_count_[0,2)", "day_count_[2,4)", "day_count_[4,6)", "day_count_[6,8)", "day_count_[8,10)", "day_count_>=10",
+                       "perc_days_[0,2)", "perc_days_[2,4)", "perc_days_[4,6)", "perc_days_[6,8)", "perc_days_[8,10)", "perc_days_>=10")]
+  
+  # Avg visits by facility ========================================================
+  # Calculate average visit count by room by month 
+  visit_count_capacity_facility <- user_activity_hour_test %>%
+    filter(workstation_loc == location) %>%
+    filter(relevant_visit == "Yes") %>%
+    filter(DERIVED_STATUS_DESC == "Arrived") %>%
+    group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>%
+    slice(which.max(ROOMED_DTTM)) %>%
+    group_by(workstation_loc) %>%
+    mutate(exam_rooms = length(unique(ROOM_IDENTIFIER))) %>%
+    group_by(workstation_loc, exam_rooms, activity_date) %>%
+    summarise(total_visits = n()) %>%
+    pivot_wider(names_from = activity_date,
+                values_from = total_visits,
+                values_fill = 0)
+  
+  # Fill in any dates with no visits to be accounted for avg visit count
+  visit_count_capacity_facility <- visit_count_capacity_facility %>%
+    pivot_longer(3:length(visit_count_capacity_facility),
+                 names_to = "activity_date",
+                 values_to = "total_visits") %>%
+    mutate(total_days = length(unique(activity_date)),
+           avg_visits = round(total_visits/exam_rooms,2)) %>%
+    mutate(avg_visits_group = case_when(avg_visits <2 ~ "[0,2)",
+                                        avg_visits >=2 & avg_visits <4 ~ "[2,4)",
+                                        avg_visits >=4 & avg_visits <6 ~ "[4,6)",
+                                        avg_visits >=6 & avg_visits <8 ~ "[6,8)",
+                                        avg_visits >= 8 & avg_visits <10 ~ "[8,10)",
+                                        avg_visits >=10 ~ ">=10")) %>%
+    group_by(workstation_loc, exam_rooms, total_days, avg_visits_group) %>%
+    summarise(day_count = n()) %>%
+    mutate(perc_days = round(day_count/total_days,2)) %>%
+    pivot_wider(names_from = avg_visits_group,
+                values_from = c("day_count","perc_days"),
+                values_fill = 0) %>%
+    add_column(workstation_floor  = "Total",
+               .after = "workstation_loc") 
+  
+  Missing <- setdiff(c("workstation_loc", "workstation_floor", "exam_rooms", 
+                       "day_count_[0,2)", "day_count_[2,4)", "day_count_[4,6)", "day_count_[6,8)", "day_count_[8,10)", "day_count_>=10",
+                       "perc_days_[0,2)", "perc_days_[2,4)", "perc_days_[4,6)", "perc_days_[6,8)", "perc_days_[8,10)", "perc_days_>=10"),
+                     names(visit_count_capacity_facility))  # Find names of missing columns
+  visit_count_capacity_facility[Missing] <- 0                    # Add them, filled with '0'
+  visit_count_capacity_facility <- visit_count_capacity_facility[c("workstation_loc", "workstation_floor", "exam_rooms", 
+                       "day_count_[0,2)", "day_count_[2,4)", "day_count_[4,6)", "day_count_[6,8)","day_count_[8,10)", "day_count_>=10",
+                       "perc_days_[0,2)", "perc_days_[2,4)", "perc_days_[4,6)", "perc_days_[6,8)", "perc_days_[8,10)","perc_days_>=10")]
+    
+    
+  
+  visit_count_capacity_merged <- bind_rows(visit_count_capacity_facility, visit_count_capacity)
+  
+  return(visit_count_capacity_merged)
+}
+
+```
+
+```{r Facility - % Days by Visit Count Output, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Facility Avg Visit Count Target Comparison Table --------------------------------------
+reactable(
+  visit_count_perc_days_function_facility(location),
+
+  # elementId = "year-month-filter-table",
+  
+  style = list(fontFamily = 'Calibri',
+                 fontSize = '14px'),
+    defaultColDef = colDef(align = "left",
+                           maxWidth = 60,
+                           headerStyle = list(background = "#7f7f7f", color = "white", fontWeight = "Bold", fontSize = "14px"),
+                           # headerStyle = list(fontWeight = "Bold", fontSize = "14px"),
+                           headerClass = "bar-sort-header"),
+
+  highlight = TRUE,
+  # filterable = TRUE,
+  pagination = FALSE,
+  # height = 700,
+  wrap = TRUE,
+  searchable = TRUE,
+
+  # rowStyle = JS("function(rowInfo) {
+  #   if (rowInfo.level == 1) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #212070'}
+  #   } if (rowInfo.level == 2) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #d80b8c'}
+  #   } if (rowInfo.level == 2) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #00aeef'}
+  #   } else {
+  #     return { borderLeft: '2px solid transparent'}
+  #   }
+  # }"),
+  
+  rowStyle = function(index) {
+            if (index == 1) list(`border-top` = "2px solid rgb(184,184,184)", 
+                                 background = "#F0F0F0", fontWeight = "Bold")
+          },
+
+  # groupBy = c("workstation_loc", "workstation_floor"),
+  
+ columnGroups = list(
+   colGroup(name = "",
+            columns = c("workstation_loc","workstation_floor","exam_rooms"), sticky = "left",
+            headerStyle = list(fontSize = "16px")),
+   colGroup(name = "% of Days by Visit/Room/Day Range",
+            columns = c("perc_days_[0,2)", "perc_days_[2,4)", "perc_days_[4,6)", "perc_days_[6,8)", "perc_days_[8,10)", "perc_days_>=10"),
+            headerStyle = list(color = "#7f7f7f", fontSize = "18px", align = "center"))
+   ),
+
+  columns = list(
+    
+    workstation_loc = colDef(
+      # footer = "Total",
+      name = "Facility",
+      maxWidth = 120,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    workstation_floor = colDef(
+      # footer = "Total",
+      name = "Floor/Suite",
+      maxWidth = 90,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    exam_rooms = colDef(
+      # footer = "Total",
+      name = "Exam Rooms",
+      maxWidth = 100,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+    
+    `perc_days_[0,2)` = colDef(
+      # footer = "Total",
+      name = "[0,2)",
+      # maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    `perc_days_[2,4)` = colDef(
+      # footer = "Total",
+      name = "[2,4)",
+      # maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    `perc_days_[4,6)` = colDef(
+      # footer = "Total",
+      name = "[4,6)",
+      # maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    `perc_days_[6,8)` = colDef(
+      # footer = "Total",
+      name = "[6,8)",
+      # maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    `perc_days_[8,10)` = colDef(
+      # footer = "Total",
+      name = "[8,10)",
+      # maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    `perc_days_>=10` = colDef(
+      # footer = "Total",
+      name = ">=10",
+      # maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    `day_count_[0,2)` = colDef(show = F),
+    `day_count_[2,4)` = colDef(show = F),
+    `day_count_[4,6)` = colDef(show = F),
+    `day_count_[6,8)` = colDef(show = F),
+    `day_count_[8,10)` = colDef(show = F),
+    `day_count_>=10` = colDef(show = F)
+
+  ) # Close Columns
+
+  ) # Close Reactable
+
+```
+<br/>
+
+
+```{r Facility - Room Utilization Function, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Facility Room Utilization ----------------------------------------------------
+room_utilization_function_facility <- function(location){
+  
+  # Room Utilization by Floor ==================================================
+  room_utilization <- user_activity_hour_test %>%
+    filter(workstation_loc == location) %>%
+    filter(relevant_visit == "Yes") %>%
+    filter(DERIVED_STATUS_DESC == "Arrived") %>%
+    group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>%
+    slice(which.max(ROOMED_DTTM)) %>%
+    group_by(PAT_ENC_CSN_ID, MRN, APPT_DTTM, DEPARTMENT_ID, workstation_loc, workstation_floor, ROOM_IDENTIFIER, # Replace APPT_DTTM AND DEPARTMENT_ID WITH PAT_ENC_CSN_ID ONCE UTILIZATION VIEW IS UPDATED
+             PROV_NAME_WID, activity_date) %>%
+    summarise(total = n()) %>%
+    dplyr::select(-total) %>%
+    left_join(utilization_tbl %>%
+                filter(UTIL_TYPE == "actual") %>%
+                dplyr::select(DEPARTMENT_ID, APPT_DTTM, MRN, 
+                              H_07_00, H_08_00, H_09_00, H_10_00, H_11_00, 
+                              H_12_00, H_13_00, H_14_00, H_15_00, H_16_00,
+                              H_17_00, H_18_00, H_19_00, H_20_00),
+              by = c("DEPARTMENT_ID","MRN","APPT_DTTM"),
+              copy = TRUE,
+              keep = NULL) %>%
+    group_by(workstation_loc, workstation_floor) %>%
+    mutate(total_days = as.character(length(unique(activity_date))),
+           exam_rooms = as.character(length(unique(ROOM_IDENTIFIER)))) %>% 
+    dplyr::select(-c(PAT_ENC_CSN_ID, MRN, APPT_DTTM, DEPARTMENT_ID, PROV_NAME_WID)) %>%
+    group_by(workstation_loc, workstation_floor, exam_rooms, total_days, activity_date) %>%
+    summarise_if(is.numeric, sum, na.rm = TRUE) %>%
+    collect()
+    
+  
+  room_utilization <- room_utilization %>%
+    pivot_longer(6:length(room_utilization),
+                names_to = "activity_hour",
+                values_to = "total_min_roomed") %>%
+    mutate(activity_hour = as.numeric(substr(activity_hour, start = 3, stop = 4)),
+           activity_session = ifelse(activity_hour <12, "AM", 
+                                     ifelse(activity_hour >=12 & activity_hour <=16, "PM", "EVE"))) %>%
+    group_by(workstation_loc, workstation_floor, exam_rooms, total_days, activity_session) %>%
+    dplyr::summarise(total_min_roomed = sum(total_min_roomed)) %>%
+    mutate(total_days = as.numeric(total_days),
+           exam_rooms = as.numeric(exam_rooms)) %>%
+    mutate(utilization = case_when(activity_session =="EVE" ~ round(total_min_roomed/(total_days*exam_rooms*2*60),2),
+                                   TRUE ~ round(total_min_roomed/(total_days*exam_rooms*4*60),2))) %>%
+    pivot_wider(names_from = activity_session,
+                values_from = total_min_roomed:utilization) %>%
+    dplyr::select(workstation_loc, workstation_floor, exam_rooms, total_days, 
+                  total_min_roomed_AM, total_min_roomed_PM, total_min_roomed_EVE,
+                  utilization_AM, utilization_PM, utilization_EVE)
+  
+  
+  # Room Utilization by Facility ==================================================
+  room_utilization_facility <- user_activity_hour_test %>%
+    filter(workstation_loc == location) %>%
+    filter(relevant_visit == "Yes") %>%
+    filter(DERIVED_STATUS_DESC == "Arrived") %>%
+    group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>%
+    slice(which.max(ROOMED_DTTM)) %>%
+    group_by(PAT_ENC_CSN_ID, MRN, APPT_DTTM, DEPARTMENT_ID, workstation_loc, workstation_floor, ROOM_IDENTIFIER, # Replace APPT_DTTM AND DEPARTMENT_ID WITH PAT_ENC_CSN_ID ONCE UTILIZATION VIEW IS UPDATED
+             PROV_NAME_WID, activity_date) %>%
+    summarise(total = n()) %>%
+    dplyr::select(-total) %>%
+    left_join(utilization_tbl %>%
+                filter(UTIL_TYPE == "actual") %>%
+                dplyr::select(DEPARTMENT_ID, APPT_DTTM, MRN, 
+                              H_07_00, H_08_00, H_09_00, H_10_00, H_11_00, 
+                              H_12_00, H_13_00, H_14_00, H_15_00, H_16_00,
+                              H_17_00, H_18_00, H_19_00, H_20_00),
+              by = c("DEPARTMENT_ID","MRN","APPT_DTTM"),
+              copy = TRUE,
+              keep = NULL) %>%
+    group_by(workstation_loc) %>%
+    mutate(total_days = as.character(length(unique(activity_date))),
+           exam_rooms = as.character(length(unique(ROOM_IDENTIFIER)))) %>% 
+    dplyr::select(-c(PAT_ENC_CSN_ID, MRN, APPT_DTTM, DEPARTMENT_ID, PROV_NAME_WID)) %>%
+    group_by(workstation_loc, exam_rooms, total_days, activity_date) %>%
+    summarise_if(is.numeric, sum, na.rm = TRUE)
+    
+  
+  room_utilization_facility <- room_utilization_facility %>%
+    pivot_longer(5:length(room_utilization_facility),
+                names_to = "activity_hour",
+                values_to = "total_min_roomed") %>%
+    mutate(activity_hour = as.numeric(substr(activity_hour, start = 3, stop = 4)),
+           activity_session = ifelse(activity_hour <12, "AM", 
+                                     ifelse(activity_hour >=12 & activity_hour <=16, "PM", "EVE"))) %>%
+    group_by(workstation_loc, exam_rooms, total_days, activity_session) %>%
+    dplyr::summarise(total_min_roomed = sum(total_min_roomed)) %>%
+    mutate(total_days = as.numeric(total_days),
+           exam_rooms = as.numeric(exam_rooms)) %>%
+    mutate(utilization = case_when(activity_session =="EVE" ~ round(total_min_roomed/(total_days*exam_rooms*2*60),2),
+                                   TRUE ~ round(total_min_roomed/(total_days*exam_rooms*4*60),2))) %>%
+    pivot_wider(names_from = activity_session,
+                values_from = total_min_roomed:utilization) %>%
+    add_column(workstation_floor  = "Total",
+             .after = "workstation_loc") %>%
+    dplyr::select(workstation_loc, workstation_floor, exam_rooms, total_days, 
+                  total_min_roomed_AM, total_min_roomed_PM, total_min_roomed_EVE,
+                  utilization_AM, utilization_PM, utilization_EVE)
+  
+  
+  room_utilization_merged <- bind_rows(room_utilization_facility, room_utilization)
+  
+  return(room_utilization_merged)
+  
+}
+
+```
+
+```{r Facility - Room Utilization Output, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Facility Avg Visit Count Target Comparison Table --------------------------------------
+reactable(
+  room_utilization_function_facility(location),
+
+  # elementId = "year-month-filter-table",
+  
+  style = list(fontFamily = 'Calibri',
+                 fontSize = '14px'),
+    defaultColDef = colDef(align = "left",
+                           maxWidth = 100,
+                           headerStyle = list(background = "#7f7f7f", color = "white", fontWeight = "Bold", fontSize = "14px"),
+                           # headerStyle = list(fontWeight = "Bold", fontSize = "14px"),
+                           headerClass = "bar-sort-header"),
+
+  highlight = TRUE,
+  # filterable = TRUE,
+  pagination = FALSE,
+  # height = 700,
+  wrap = TRUE,
+  searchable = TRUE,
+
+  # rowStyle = JS("function(rowInfo) {
+  #   if (rowInfo.level == 1) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #212070'}
+  #   } if (rowInfo.level == 2) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #d80b8c'}
+  #   } if (rowInfo.level == 2) {
+  #     return { background: '#f2f2f2', borderLeft: '3px solid #00aeef'}
+  #   } else {
+  #     return { borderLeft: '2px solid transparent'}
+  #   }
+  # }"),
+  
+  rowStyle = function(index) {
+            if (index == 1) list(`border-top` = "2px solid rgb(184,184,184)", 
+                                 background = "#F0F0F0", fontWeight = "Bold")
+          },
+
+  # groupBy = c("workstation_loc", "workstation_floor"),
+  
+ columnGroups = list(
+   colGroup(name = "",
+            columns = c("workstation_loc","workstation_floor","exam_rooms"), sticky = "left",
+            headerStyle = list(fontSize = "16px")),
+   colGroup(name = "% of Room Utilization",
+            columns = c("utilization_AM", "utilization_PM", "utilization_EVE"),
+            headerStyle = list(color = "#7f7f7f", fontSize = "18px", align = "center"))
+   ),
+
+  columns = list(
+    
+    workstation_loc = colDef(
+      # footer = "Total",
+      name = "Facility",
+      maxWidth = 120,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    workstation_floor = colDef(
+      # footer = "Total",
+      name = "Floor/Suite",
+      maxWidth = 90,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    exam_rooms = colDef(
+      # footer = "Total",
+      name = "Exam Rooms",
+      maxWidth = 100,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+    
+    utilization_AM = colDef(
+      # footer = "Total",
+      name = "AM (4 Hours)",
+      # maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    utilization_PM = colDef(
+      # footer = "Total",
+      name = "PM (4 Hours)",
+      # maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    utilization_EVE = colDef(
+      # footer = "Total",
+      name = "EVE (2 Hours)",
+      # maxWidth = 200,
+      format = colFormat(percent = TRUE, digits = 0)),
+    
+    total_days = colDef(show = F),
+    total_min_roomed_AM = colDef(show = F),
+    total_min_roomed_PM = colDef(show = F),
+    total_min_roomed_EVE = colDef(show = F)
+
+  ) # Close Columns
+
+  ) # Close Reactable
+
+```
+<br/>
+
+
+
+<!-- ```{r Visits per Room per Day } -->
+
+
+<!-- visit_count_day <- user_activity_hour_test %>% -->
+<!--   filter(relevant_visit == "Yes") %>% -->
+<!--   filter(DERIVED_STATUS_DESC == "Arrived") %>% -->
+<!--   group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>% -->
+<!--   slice(which.max(ROOMED_DTTM)) %>% -->
+<!--   group_by(activity_date, ROOM_IDENTIFIER) %>% -->
+<!--   summarise(total_visits = n()) %>% -->
+<!--   pivot_wider(names_from = activity_date, -->
+<!--               values_from = total_visits, -->
+<!--               values_fill = 0) -->
+<!-- visit_count_day <- visit_count_day %>% -->
+<!--   pivot_longer(2:length(visit_count_day), -->
+<!--                names_to = "activity_date", -->
+<!--                values_to = "total_visits") -->
+
+<!-- visit_count_day <- visit_count_day %>% -->
+<!--   mutate(total_rooms = length(unique(ROOM_IDENTIFIER))) %>% -->
+<!--   group_by(activity_date, total_rooms) %>% -->
+<!--   summarise(total_visits = sum(total_visits)) %>% -->
+<!--   mutate(total_exp_visits = total_rooms*5) %>% -->
+<!--   ungroup() %>% -->
+<!--   mutate(color = ifelse(total_visits < total_exp_visits, "#ff0000", "#33cc33")) -->
+
+<!-- visit_count_day <- visit_count_day %>% -->
+<!--   mutate(activity_date = as.Date(activity_date)) -->
+
+
+<!-- highchart(type = "stock") %>% -->
+<!--   hc_add_series(data = visit_count_day, "column", -->
+<!--                 hcaes(x = activity_date, y = total_visits, color = color), -->
+<!--                 showInLegend = TRUE) %>% -->
+<!--   hc_xAxis(title = list(text = ''), -->
+<!--            tegories = visit_count_day$activity_date, -->
+<!--            labels = list(format = '{value:%Y-%m-%d}', rotation = "310")) -->
+
+
+<!-- ``` -->
+
+
+
+## By Department
+### Visit Count by Room
+```{r Visit Count by Room by Hour, echo = FALSE, warning = FALSE, message = FALSE}
+
+# Only including relevant visits (i.e. user access = visit date)
+# Based on roomed_dttm not access_dttm
+
+visit_count_hour <- user_activity_hour_test %>%
+  filter(relevant_visit == "Yes") %>%
+  filter(DERIVED_STATUS_DESC == "Arrived") %>%
+  group_by(activity_date, roomed_hour, PAT_ENC_CSN_ID) %>%
+  slice(which.max(ROOMED_DTTM)) %>%
+  group_by(activity_date, roomed_hour, ROOM_IDENTIFIER) %>%
+  summarise(total_visits = n()) %>%
+  pivot_wider(names_from = activity_date,
+              values_from = total_visits,
+              values_fill = 0)
+visit_count_hour <- visit_count_hour %>%
+  pivot_longer(3:length(visit_count_hour),
+               names_to = "activity_date",
+               values_to = "total_visits") %>%
+  mutate(roomed_hour = as.numeric(roomed_hour)) %>%
+  arrange(roomed_hour) %>%
+  pivot_wider(names_from = roomed_hour,
+              values_from = total_visits,
+              values_fill = 0)
+
+
+Missing <- setdiff(c("ROOM_IDENTIFIER", "activity_date", hour_order), names(visit_count_hour))  # Find names of missing columns
+visit_count_hour[Missing] <- 0                    # Add them, filled with '0's
+visit_count_hour <- visit_count_hour[c("ROOM_IDENTIFIER", "activity_date", hour_order)]
+
+
+visit_count_hour <- visit_count_hour %>%
+  mutate(total_visits = rowSums(across(where(is.numeric)))) %>%
+  add_column(activity_day  = NA,
+             .after = "ROOM_IDENTIFIER") %>%
+  add_column(activity_yearmonth = NA,
+             .after = "activity_day") %>%
+  mutate(activity_day = format(as.Date(activity_date), "%a"),
+         activity_yearmonth = format(as.Date(activity_date), "%Y-%m")) %>%
+  arrange(factor(activity_day, levels = day_order)) %>%
+  mutate(total_am = rowSums(.[5:9])/4,
+         total_pm = rowSums(.[10:13])/4,
+         total_eve = rowSums(.[14:17])/4)
+
+
+
+# Visit Count by Room by Hour Output -------------------------------------------
+
+htmltools::browsable(
+  tagList(
+    div(
+      div(tags$label("Filter Year-Month", `for` = "year-month-filter",
+                     style = "font-weight: bold; color:black; font-family: Calibri; font-size: 20px;")),
+      tags$select(
+        id = "year-month-filter",
+        onchange = "Reactable.setFilter('year-month-filter-table', 'activity_yearmonth', this.value)",
+        tags$option("All", value = ""),
+        lapply(unique(visit_count_hour$activity_yearmonth), tags$option)
+      )
+    ),
+
+    tags$hr("aria-hidden" = "true"),
+
+reactable(
+  visit_count_hour,
+
+  elementId = "year-month-filter-table",
+
+  style = list(fontFamily = 'Calibri',
+                 fontSize = '14px'),
+    defaultColDef = colDef(align = "left",
+                           headerStyle = list(background = "#7f7f7f", color = "white", fontWeight = "Bold", fontSize = "14px"),
+                           # headerStyle = list(fontWeight = "Bold", fontSize = "14px"),
+                           headerClass = "bar-sort-header"),
+
+    highlight = TRUE,
+    # filterable = TRUE,
+    pagination = FALSE,
+    # height = 700,
+    wrap = TRUE,
+  searchable = TRUE,
+
+  rowStyle = JS("function(rowInfo) {
+    if (rowInfo.level == 1) {
+      return { background: '#f2f2f2', borderLeft: '3px solid #212070'}
+    } if (rowInfo.level == 2) {
+      return { background: '#f2f2f2', borderLeft: '3px solid #d80b8c'}
+    } if (rowInfo.level == 2) {
+      return { background: '#f2f2f2', borderLeft: '3px solid #00aeef'}
+    } else {
+      return { borderLeft: '2px solid transparent'}
+    }
+  }"),
+
+  groupBy = c("ROOM_IDENTIFIER", "activity_day", "activity_yearmonth"),
+
+  columnGroups = list(
+    # colGroup(name = paste0(format(as.Date(start_date), "%b"),"-",format(as.Date(end_date), "%b %Y"), " Visit Volume"),
+    #          columns = c("Total", "new_perc"),
+    #          headerStyle = list(color = "#212070", fontSize = "16px")),
+    # colGroup(name = paste0(format(as.Date(start_date), "%b"),"-",format(as.Date(end_date), "%b %Y"), " No Show Rate"),
+    #          columns = c("noShow_rate", "noShow_rate_Established", "noShow_rate_New"),
+    #          headerStyle = list(color = "#d80b8c", fontSize = "16px"))
+    colGroup(name = "",
+             columns = c("ROOM_IDENTIFIER","activity_day","activity_yearmonth","activity_date"), sticky = "left",
+             headerStyle = list(fontSize = "16px")),
+    colGroup(name = "Average Visit Count by Hour",
+             columns = c("7","8","9","10","11","12","13","14","15","16","17","18","19","20"),
+             headerStyle = list(color = "#7f7f7f", fontSize = "18px", align = "center")),
+    colGroup(name = "Average Visit Count by Session",
+             columns = c("total_visits", "total_am", "total_pm", "total_eve"),
+             headerStyle = list(color = "#d80b8c", fontSize = "18px"))
+    ),
+
+  columns = list(
+
+    ROOM_IDENTIFIER = colDef(
+      # footer = "Total",
+      name = "Room #",
+      maxWidth = 200,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    activity_day = colDef(
+      name = "Day",
+      maxWidth = 120,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    activity_yearmonth = colDef(
+      name = "Year-Month",
+      maxWidth = 150,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    activity_date = colDef(
+      name = "Date",
+      maxWidth = 150,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    `7` = colDef(
+      name = "7 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `8` = colDef(
+      name = "8 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `9` = colDef(
+      name = "9 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `10` = colDef(
+      name = "10 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `11` = colDef(
+      name = "11 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `12` = colDef(
+      name = "12 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `13` = colDef(
+      name = "1 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `14` = colDef(
+      name = "2 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `15` = colDef(
+      name = "3 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `16` = colDef(
+      name = "4 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `17` = colDef(
+      name = "5 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `18` = colDef(
+      name = "6 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `19` = colDef(
+      name = "7 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `20` = colDef(
+      name = "8 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    total_visits = colDef(
+      name = "Avg Visits/Day",
+      maxWidth = 120,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    total_am = colDef(
+      name = "Avg Visits/AM Sesion",
+      maxWidth = 120,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    total_pm = colDef(
+      name = "Avg Visits/PM Sesion",
+      maxWidth = 120,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    total_eve = colDef(
+      name = "Avg Visits/EVE Sesion",
+      maxWidth = 120,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      aggregate = 'mean',
+      format = colFormat(separators = TRUE, digits = 2),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    )
+
+  ) # Close Columns
+
+  ) # Close Reactable
+
+) # Close tagList
+) # Close widget
+
+```
+<br/>
+<br/>
+
+### Utilization by User Activity by Room
+```{r % Utilization by Room by Hour (User Activity), echo = FALSE, warning = FALSE, message = FALSE}
+
+# Including all user activities happened in rooms
+# Based on access_dttm
+
+user_activity_hour <- user_activity_hour_test %>%
+  group_by(ROOM_IDENTIFIER, activity_date, activity_hour) %>%
+  summarise(total_min_active = ceiling(sum(NUMBER_OF_SECONDS_ACTIVE)/60)) %>%
+  pivot_wider(names_from = activity_date,
+              values_from = total_min_active,
+              values_fill = 0)
+user_activity_hour <- user_activity_hour %>%
+  pivot_longer(3:length(user_activity_hour),
+               names_to = "activity_date",
+               values_to = "total_min_active") %>%
+  mutate(activity_hour = as.numeric(activity_hour)) %>%
+  arrange(activity_hour) %>%
+  pivot_wider(names_from = activity_hour,
+              values_from = total_min_active,
+              values_fill = 0)
+
+Missing <- setdiff(c("ROOM_IDENTIFIER", "activity_date", hour_order), names(user_activity_hour))  # Find names of missing columns
+user_activity_hour[Missing] <- 0                    # Add them, filled with '0's
+user_activity_hour <- user_activity_hour[c("ROOM_IDENTIFIER", "activity_date", hour_order)]
+
+user_activity_hour <- user_activity_hour %>%
+  pivot_longer(3:length(user_activity_hour),
+               names_to = "activity_hour",
+               values_to = "total_min_active") %>%
+  mutate(activity_hour = as.numeric(activity_hour)) %>%
+  arrange(activity_hour) %>%
+  mutate(avg_perc_active = round(total_min_active/60,2))
+user_activity_hour <- user_activity_hour %>%
+  pivot_wider(names_from = activity_hour,
+              values_from = total_min_active:avg_perc_active,
+              values_fill = 0) %>%
+  add_column(activity_day  = NA,
+             .after = "ROOM_IDENTIFIER") %>%
+  add_column(activity_yearmonth = NA,
+             .after = "activity_day") %>%
+  mutate(activity_day = format(as.Date(activity_date), "%a"),
+         activity_yearmonth = format(as.Date(activity_date), "%Y-%m")) %>%
+  arrange(factor(activity_day, levels = day_order)) %>%
+  rowwise() %>%
+  mutate(total_min_active_day = sum(c_across(total_min_active_7:total_min_active_16)),
+         total_min_active_am = sum(c_across(total_min_active_7:total_min_active_11)),
+         total_min_active_pm = sum(c_across(total_min_active_12:total_min_active_16)),
+         avg_perc_active_day = round(total_min_active_day/(8*60),2),
+         avg_perc_active_am = round(total_min_active_am/(4*60),2),
+         avg_perc_active_pm = round(total_min_active_pm/(4*60),2))
+
+
+
+# User Activity % Utilization by Room by Hour Output ---------------------------
+
+htmltools::browsable(
+  tagList(
+    div(
+      div(tags$label("Filter Year-Month", `for` = "year-month-filter",
+                     style = "font-weight: bold; color:black; font-family: Calibri; font-size: 20px;")),
+      tags$select(
+        id = "year-month-filter",
+        onchange = "Reactable.setFilter('user-activity-perc-table', 'activity_yearmonth', this.value)",
+        tags$option("All", value = ""),
+        lapply(unique(visit_count_hour$activity_yearmonth), tags$option)
+      )
+    ),
+
+    tags$hr("aria-hidden" = "true"),
+
+reactable(
+  user_activity_hour,
+
+  elementId = "user-activity-perc-table",
+
+  style = list(fontFamily = 'Calibri',
+                 fontSize = '14px'),
+    defaultColDef = colDef(align = "left",
+                           headerStyle = list(background = "#7f7f7f", color = "white", fontWeight = "Bold", fontSize = "14px"),
+                           # headerStyle = list(fontWeight = "Bold", fontSize = "14px"),
+                           headerClass = "bar-sort-header"),
+
+    highlight = TRUE,
+    # filterable = TRUE,
+    pagination = FALSE,
+    # height = 700,
+    wrap = TRUE,
+  searchable = TRUE,
+
+  rowStyle = JS("function(rowInfo) {
+    if (rowInfo.level == 1) {
+      return { background: '#f2f2f2', borderLeft: '3px solid #212070'}
+    } if (rowInfo.level == 2) {
+      return { background: '#f2f2f2', borderLeft: '3px solid #d80b8c'}
+    } if (rowInfo.level == 2) {
+      return { background: '#f2f2f2', borderLeft: '3px solid #00aeef'}
+    } else {
+      return { borderLeft: '2px solid transparent'}
+    }
+  }"),
+
+  groupBy = c("ROOM_IDENTIFIER", "activity_day", "activity_yearmonth"),
+
+  columnGroups = list(
+    colGroup(name = "",
+             columns = c("ROOM_IDENTIFIER","activity_day","activity_yearmonth","activity_date"), sticky = "left",
+             headerStyle = list(fontSize = "16px")),
+    colGroup(name = "Average % User Active by Hour",
+             columns = c("avg_perc_active_7","avg_perc_active_8","avg_perc_active_9","avg_perc_active_10",
+                         "avg_perc_active_11","avg_perc_active_12","avg_perc_active_13","avg_perc_active_14",
+                         "avg_perc_active_15","avg_perc_active_16","avg_perc_active_17","avg_perc_active_18",
+                         "avg_perc_active_19","avg_perc_active_20"),
+             headerStyle = list(color = "#7f7f7f", fontSize = "18px", align = "center")),
+    colGroup(name = "Average % User Active by Session",
+             columns = c("avg_perc_active_day", "avg_perc_active_am", "avg_perc_active_pm"),
+             headerStyle = list(color = "#d80b8c", fontSize = "18px"))
+    ),
+
+  columns = list(
+
+    ROOM_IDENTIFIER = colDef(
+      # footer = "Total",
+      name = "Room #",
+      maxWidth = 200,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    activity_day = colDef(
+      name = "Day",
+      maxWidth = 120,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    activity_yearmonth = colDef(
+      name = "Year-Month",
+      maxWidth = 150,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    activity_date = colDef(
+      name = "Date",
+      maxWidth = 150,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    `avg_perc_active_7` = colDef(
+      name = "7 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_8` = colDef(
+      name = "8 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_9` = colDef(
+      name = "9 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_10` = colDef(
+      name = "10 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_11` = colDef(
+      name = "11 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_12` = colDef(
+      name = "12 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_13` = colDef(
+      name = "1 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_14` = colDef(
+      name = "2 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_15` = colDef(
+      name = "3 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_16` = colDef(
+      name = "4 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_17` = colDef(
+      name = "5 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_18` = colDef(
+      name = "6 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_19` = colDef(
+      name = "7 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_active_20` = colDef(
+      name = "8 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    avg_perc_active_day = colDef(
+      name = "Avg % User Active/Day",
+      maxWidth = 120,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    avg_perc_active_am = colDef(
+      name = "Avg % User Active/AM Session",
+      maxWidth = 120,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    avg_perc_active_pm = colDef(
+      name = "Avg % User Active/PM Session",
+      maxWidth = 120,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    total_min_active_7 = colDef(show =F),
+    total_min_active_8 = colDef(show =F),
+    total_min_active_9 = colDef(show =F),
+    total_min_active_10 = colDef(show =F),
+    total_min_active_11 = colDef(show =F),
+    total_min_active_12 = colDef(show =F),
+    total_min_active_13 = colDef(show =F),
+    total_min_active_14 = colDef(show =F),
+    total_min_active_15 = colDef(show =F),
+    total_min_active_16 = colDef(show =F),
+    total_min_active_17 = colDef(show =F),
+    total_min_active_18 = colDef(show =F),
+    total_min_active_19 = colDef(show =F),
+    total_min_active_20 = colDef(show =F),
+    total_min_active_day = colDef(show =F),
+    total_min_active_am = colDef(show =F),
+    total_min_active_pm = colDef(show =F)
+
+  ) # Close Columns
+
+  ) # Close Reactable
+
+) # Close tagList
+) # Close widget
+
+
+
+
+```
+<br/>
+<br/>
+
+### Utilization by Roomed Time by Room
+```{r % Utilization by Room by Hour (Room-in to Visit-end), echo = FALSE, warning = FALSE, message = FALSE}
+
+# Including alls
+# Based on access_dttm
+
+visit_utilization_hour <- user_activity_hour_test %>%
+  filter(relevant_visit == "Yes") %>%
+  filter(DERIVED_STATUS_DESC == "Arrived") %>%
+  group_by(PAT_ENC_CSN_ID, MRN, APPT_DTTM, DEPARTMENT_ID,
+           ROOM_IDENTIFIER, PROV_NAME_WID, activity_date) %>%
+  summarise(total = n()) %>%
+  dplyr::select(-total) %>%
+  left_join(utilization_tbl %>%
+              filter(UTIL_TYPE == "actual") %>%
+              dplyr::select(DEPARTMENT_ID, APPT_DTTM, MRN,
+                            H_07_00, H_08_00, H_09_00, H_10_00, H_11_00,
+                            H_12_00, H_13_00, H_14_00, H_15_00, H_16_00,
+                            H_17_00, H_18_00, H_19_00, H_20_00),
+            by = c("DEPARTMENT_ID","MRN","APPT_DTTM"),
+            copy = TRUE,
+            keep = NULL) %>%
+  collect()
+visit_utilization_hour <- visit_utilization_hour %>%
+  ungroup() %>%
+  dplyr::select(-c(PAT_ENC_CSN_ID, MRN, APPT_DTTM, DEPARTMENT_ID, PROV_NAME_WID)) %>%
+  group_by(ROOM_IDENTIFIER, activity_date) %>%
+  summarise_if(is.numeric, sum, na.rm = TRUE)
+visit_utilization_hour <- visit_utilization_hour %>%
+  pivot_longer(3:length(visit_utilization_hour),
+               names_to = "activity_hour",
+               values_to = "total_min_roomed") %>%
+  mutate(activity_hour = as.numeric(substr(activity_hour, start = 3, stop = 4)),
+         total_min_roomed = ifelse(is.na(total_min_roomed), 0, total_min_roomed),
+         avg_perc_roomed = round(total_min_roomed/60,2)) %>%
+  pivot_wider(names_from = activity_hour,
+              values_from = total_min_roomed:avg_perc_roomed,
+              values_fill = 0) %>%
+  add_column(activity_day  = NA,
+             .after = "ROOM_IDENTIFIER") %>%
+  add_column(activity_yearmonth = NA,
+             .after = "activity_day") %>%
+  mutate(activity_day = format(as.Date(activity_date), "%a"),
+         activity_yearmonth = format(as.Date(activity_date), "%Y-%m")) %>%
+  arrange(factor(activity_day, levels = day_order)) %>%
+  rowwise() %>%
+  mutate(total_min_roomed_day = sum(c_across(total_min_roomed_7:total_min_roomed_16)),
+         total_min_roomed_am = sum(c_across(total_min_roomed_7:total_min_roomed_11)),
+         total_min_roomed_pm = sum(c_across(total_min_roomed_12:total_min_roomed_16)),
+         avg_perc_roomed_day = round(total_min_roomed_day/(8*60),2),
+         avg_perc_roomed_am = round(total_min_roomed_am/(4*60),2),
+         avg_perc_roomed_pm = round(total_min_roomed_pm/(4*60),2))
+
+
+
+
+# User Activity % Utilization by Room by Hour Output ---------------------------
+
+htmltools::browsable(
+  tagList(
+    div(
+      div(tags$label("Filter Year-Month", `for` = "year-month-filter",
+                     style = "font-weight: bold; color:black; font-family: Calibri; font-size: 20px;")),
+      tags$select(
+        id = "year-month-filter",
+        onchange = "Reactable.setFilter('visit-roomed-perc-table', 'activity_yearmonth', this.value)",
+        tags$option("All", value = ""),
+        lapply(unique(visit_count_hour$activity_yearmonth), tags$option)
+      )
+    ),
+
+    tags$hr("aria-hidden" = "true"),
+
+reactable(
+  visit_utilization_hour,
+
+  elementId = "visit-roomed-perc-table",
+
+  style = list(fontFamily = 'Calibri',
+                 fontSize = '14px'),
+    defaultColDef = colDef(align = "left",
+                           headerStyle = list(background = "#7f7f7f", color = "white", fontWeight = "Bold", fontSize = "14px"),
+                           # headerStyle = list(fontWeight = "Bold", fontSize = "14px"),
+                           headerClass = "bar-sort-header"),
+
+    highlight = TRUE,
+    # filterable = TRUE,
+    pagination = FALSE,
+    # height = 700,
+    wrap = TRUE,
+  searchable = TRUE,
+
+  rowStyle = JS("function(rowInfo) {
+    if (rowInfo.level == 1) {
+      return { background: '#f2f2f2', borderLeft: '3px solid #212070'}
+    } if (rowInfo.level == 2) {
+      return { background: '#f2f2f2', borderLeft: '3px solid #d80b8c'}
+    } if (rowInfo.level == 2) {
+      return { background: '#f2f2f2', borderLeft: '3px solid #00aeef'}
+    } else {
+      return { borderLeft: '2px solid transparent'}
+    }
+  }"),
+
+  groupBy = c("ROOM_IDENTIFIER", "activity_day", "activity_yearmonth"),
+
+  columnGroups = list(
+    colGroup(name = "",
+             columns = c("ROOM_IDENTIFIER","activity_day","activity_yearmonth","activity_date"), sticky = "left",
+             headerStyle = list(fontSize = "16px")),
+    colGroup(name = "Average % Patient Roomed Time by Hour",
+             columns = c("avg_perc_roomed_7","avg_perc_roomed_8","avg_perc_roomed_9","avg_perc_roomed_10",
+                         "avg_perc_roomed_11","avg_perc_roomed_12","avg_perc_roomed_13","avg_perc_roomed_14",
+                         "avg_perc_roomed_15","avg_perc_roomed_16","avg_perc_roomed_17","avg_perc_roomed_18",
+                         "avg_perc_roomed_19","avg_perc_roomed_20"),
+             headerStyle = list(color = "#7f7f7f", fontSize = "18px", align = "center")),
+    colGroup(name = "Average % Patient Roomed Time by Session",
+             columns = c("avg_perc_roomed_day", "avg_perc_roomed_am", "avg_perc_roomed_pm"),
+             headerStyle = list(color = "#d80b8c", fontSize = "18px"))
+    ),
+
+  columns = list(
+
+    ROOM_IDENTIFIER = colDef(
+      # footer = "Total",
+      name = "Room #",
+      maxWidth = 200,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    activity_day = colDef(
+      name = "Day",
+      maxWidth = 120,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    activity_yearmonth = colDef(
+      name = "Year-Month",
+      maxWidth = 150,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    activity_date = colDef(
+      name = "Date",
+      maxWidth = 150,
+      headerStyle = list(background = "white", color = "black", fontWeight = "Bold", fontSize = "14px")),
+
+    `avg_perc_roomed_7` = colDef(
+      name = "7 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_8` = colDef(
+      name = "8 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_9` = colDef(
+      name = "9 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_10` = colDef(
+      name = "10 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_11` = colDef(
+      name = "11 AM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_12` = colDef(
+      name = "12 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_13` = colDef(
+      name = "1 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_14` = colDef(
+      name = "2 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_15` = colDef(
+      name = "3 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_16` = colDef(
+      name = "4 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_17` = colDef(
+      name = "5 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_18` = colDef(
+      name = "6 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_19` = colDef(
+      name = "7 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    `avg_perc_roomed_20` = colDef(
+      name = "8 PM",
+      maxWidth = 70,
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    avg_perc_roomed_day = colDef(
+      name = "Avg % Roomed Time/Day",
+      maxWidth = 120,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    avg_perc_roomed_am = colDef(
+      name = "Avg % Roomed Time/AM Session",
+      maxWidth = 120,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    avg_perc_roomed_pm = colDef(
+      name = "Avg % Roomed Time/PM Session",
+      maxWidth = 120,
+      headerStyle = list(background = "#d80b8c", color = "white", fontWeight = "Bold", fontSize = "14px"),
+      aggregate = 'mean',
+      format = colFormat(percent = TRUE, digits = 0),
+      style = list(borderLeft = "1.5px solid rgb(230, 230, 230)")
+    ),
+
+    total_min_roomed_7 = colDef(show =F),
+    total_min_roomed_8 = colDef(show =F),
+    total_min_roomed_9 = colDef(show =F),
+    total_min_roomed_10 = colDef(show =F),
+    total_min_roomed_11 = colDef(show =F),
+    total_min_roomed_12 = colDef(show =F),
+    total_min_roomed_13 = colDef(show =F),
+    total_min_roomed_14 = colDef(show =F),
+    total_min_roomed_15 = colDef(show =F),
+    total_min_roomed_16 = colDef(show =F),
+    total_min_roomed_17 = colDef(show =F),
+    total_min_roomed_18 = colDef(show =F),
+    total_min_roomed_19 = colDef(show =F),
+    total_min_roomed_20 = colDef(show =F),
+    total_min_roomed_day = colDef(show =F),
+    total_min_roomed_am = colDef(show =F),
+    total_min_roomed_pm = colDef(show =F)
+
+  ) # Close Columns
+
+  ) # Close Reactable
+
+) # Close tagList
+) # Close widget
+
+```
+<br/>
+
