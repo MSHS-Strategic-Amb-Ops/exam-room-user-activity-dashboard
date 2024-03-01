@@ -345,10 +345,6 @@ visit_capacity_order <- c(paste0("visit_capacity_",4:10))
 
 report_run_date <- Sys.Date()
 
-test <- clarity_lws_tbl %>% 
-              filter(!is.na(ROOM_IDENTIFIER)) %>%
-              dplyr::select(WORKSTATION_ID, WORKSTN_IDENTIFIER, ROOM_IDENTIFIER, PRIM_DEPARTMENT_ID) %>%
-  collect()
 ```
 
 
@@ -380,26 +376,6 @@ workstation_mapping <- workstation_mapping %>%
 ## Subset mapped workstations only ---------------------------------------------
 workstations_mapped <- unique((workstation_mapping %>% filter(!is.na(WORKSTN_IDENTIFIER)))$WORKSTATION_ID)
 
-
-# workstation_mapping <- workstation_mapping %>%
-#   left_join(clarity_lws_tbl %>%
-#               dplyr::select(WORKSTATION_ID, WORKSTN_IDENTIFIER, ROOM_IDENTIFIER, PRIM_DEPARTMENT_ID),
-#             by = c("WORKSTATION_ID"), 
-#             copy = TRUE) 
-# 
-# workstation_mapping <- workstation_mapping %>%
-#   left_join(access_raw_tbl %>% 
-#               group_by(DEPARTMENT_ID, DEPARTMENT_NAME, SITE) %>%
-#               summarise(total = n()) %>%
-#               dplyr::select(-total),
-#             by = c("PRIM_DEPARTMENT_ID.y" = "DEPARTMENT_ID"),
-#             copy = TRUE) %>%
-#   rename("PRIM_DEPARTMENT_NAME" = "DEPARTMENT_NAME",
-#          "PRIM_SITE" = "SITE") 
-# 
-# 
-# require(openxlsx)
-# write.xlsx(workstation_mapping, "Workstation Mapping Validation.xlsx")
 ```
 
 
@@ -410,31 +386,13 @@ user_activity_hour <- user_activity_hour_tbl %>%
   filter(WORKSTATION_ID %in% workstations_mapped)
 
 
-## Join for workstation details ------------------------------------------------
-# user_activity_hour <- user_activity_hour %>%
-#   left_join(workstation_mapping, 
-#             by = "WORKSTATION_ID") %>%
-#   # left_join(clarity_lws_tbl %>%
-#   #             dplyr::select(WORKSTATION_ID, WORKSTN_IDENTIFIER, ROOM_IDENTIFIER, PRIM_DEPARTMENT_ID),
-#   #           by = c("WORKSTATION_ID")) %>%
-#   filter(!is.na(PRIM_DEPARTMENT_ID))
-
-
-## Join for primary department details -----------------------------------------
-# user_activity_hour <- user_activity_hour %>%
-#   left_join(access_raw_tbl %>% 
-#               group_by(DEPARTMENT_ID, DEPARTMENT_NAME, SITE) %>%
-#               summarise(total = n()) %>%
-#               dplyr::select(-total),
-#             by = c("PRIM_DEPARTMENT_ID" = "DEPARTMENT_ID")) %>%
-#   rename("PRIM_DEPARTMENT_NAME" = "DEPARTMENT_NAME",
-#          "PRIM_SITE" = "SITE") 
-
-
-## Map Provider Type -----------------------
+## Map Provider Type on User ID -----------------------
 user_activity_hour <- user_activity_hour %>%
   left_join(clarity_ser_tbl %>%
-              dplyr::select(USER_ID, PROV_ID, PROV_NAME, PROV_TYPE, STAFF_RESOURCE, CLINICIAN_TITLE),
+              dplyr::select(USER_ID, PROV_ID, PROV_NAME, PROV_TYPE) %>%
+              rename("PROV_ID_USER" = "PROV_ID",
+                     "PROV_TYPE_USER" = "PROV_TYPE",
+                     "PROV_NAME_USER" = "PROV_NAME"),
             by = c("USER_ID"),
             copy = TRUE) 
 
@@ -442,23 +400,34 @@ user_activity_hour <- user_activity_hour %>%
 ## Map Encounter Details -------------------
 user_activity_hour <- user_activity_hour %>%
   left_join(access_raw_tbl %>%
-              dplyr::select(PAT_ENC_CSN_ID, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, 
+              dplyr::select(PAT_ENC_CSN_ID, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_ID,
                             SITE, DEPT_SPECIALTY_NAME, LOC_NAME,
                             CONTACT_DATE, DERIVED_STATUS_DESC,
                             CHECKIN_DTTM, ROOMED_DTTM, VISIT_END_DTTM, CHECKOUT_DTTM, CYCLE_TIME_MINUTES, TIME_IN_ROOM_MINUTES,
-                            MRN, APPT_DTTM),
+                            MRN, APPT_DTTM) %>%
+              rename("PROV_ID_SCHEDULING" = "PROV_ID"),
             by = c("PAT_ENC_CSN_ID"),
             copy = TRUE)
+
+
+## Map Provider Type on Scheduled Provider -----------------------
+user_activity_hour <- user_activity_hour %>%
+  left_join(clarity_ser_tbl %>%
+              dplyr::select(PROV_ID, PROV_TYPE) %>%
+              rename("PROV_TYPE_SCHEDULING" = "PROV_TYPE"),
+            by = c("PROV_ID_SCHEDULING" = "PROV_ID"),
+            copy = TRUE) 
 
 
 ## Join by Workstation Mapping ------------------
 user_activity_hour_data <- user_activity_hour %>%
   collect() 
 
-# user_activity_hour_data <- user_activity_hour_data %>%
-#   left_join(workstation_mapping, 
-#             by = "WORKSTATION_ID",
-#             na_matches = "never")
+## Map Workstation Details using Internal Workstation Mapping Data ------------
+user_activity_hour_data <- user_activity_hour_data %>%
+  left_join(workstation_mapping,
+            by = "WORKSTATION_ID",
+            na_matches = "never")
             
   
 ## Flag/Filter activities not representing actual visits in room --------------
@@ -474,7 +443,7 @@ user_activity_hour_data <- user_activity_hour_data %>%
 
 ## Calculate Minutes in Room ----------------------
 utilization_data <- user_activity_hour_data %>%
-  dplyr::select(ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, DEPARTMENT_NAME, PROV_NAME_WID, 
+  dplyr::select(ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING, 
                 WORKSTN_IDENTIFIER, Room, `Type Name`,
                 PRIM_DEPARTMENT_ID, PRIM_SITE, PRIM_DEPARTMENT_NAME,
                 Campus, `Building Address`, `Floor/Suite`, 
@@ -483,16 +452,19 @@ utilization_data <- user_activity_hour_data %>%
 
 
 ## Collapse Active Seconds by Quarter columns into rows --------------------
+### Grouping by appointment scheduled provider NOT user ID & unique encounter ID 
 utilization_data <- utilization_data %>%
   pivot_longer(NUMBER_OF_SECONDS_ACTIVE_Q1:NUMBER_OF_SECONDS_ACTIVE_Q4,
                names_to = "active_quarter",
                values_to = "active_seconds") %>%
-  group_by(ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, DEPARTMENT_NAME, PROV_NAME_WID, WORKSTN_IDENTIFIER, Room, `Type Name`,
+  group_by(ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING, 
+           WORKSTN_IDENTIFIER, Room, `Type Name`,
            PRIM_DEPARTMENT_ID, PRIM_SITE, PRIM_DEPARTMENT_NAME, 
            Campus, `Building Address`, `Floor/Suite`, 
            WORKSTN_OWNER, `Leased or Owned`, `Hospital or NonHospital`,
            active_quarter) %>%
   summarise(active_seconds = sum(active_seconds))
+
 
 utilization_data <- utilization_data %>%
   mutate(active_quarter= case_when(active_quarter == "NUMBER_OF_SECONDS_ACTIVE_Q1" ~ "Q1",
@@ -519,33 +491,40 @@ utilization_data <- utilization_data %>%
 
 
 ## Assign 15 minutes to active quarters by hour ------------------------------
+### Start and End of quarter by hour, room and encounter ID 
 active_minutes <- utilization_data %>%
-  group_by(ACTIVITY_HOUR_DTTM, WORKSTN_IDENTIFIER, unique_id) %>%
-  filter(active_seconds > 0) %>%
-  mutate(min_quarter_start = min(quarter_start),
-         max_quarter_start = max(quarter_end)) %>%
-  dplyr::select(-c(active_quarter, active_seconds, quarter_start, quarter_end))
+  mutate(activity_date = as.Date(ACTIVITY_HOUR_DTTM, "%y-%m-%d")) %>%
+  group_by(activity_date, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID) %>%
+  filter(active_seconds > 0) %>% # Disregard any activities occured for less than 5 seconds
+  mutate(pt_room_enter = min(quarter_start),
+         pt_room_exit = max(quarter_end)) %>%
+  dplyr::select(activity_date, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID, pt_room_enter, pt_room_exit)
 
 
-## Merge with data with every 15 minute interval -----------------------------
+### Merge with active_minutes 
 utilization_data <- utilization_data %>%
-  left_join(active_minutes) %>%
   distinct() %>%
-  mutate(room_minutes = ifelse(between(quarter_start, min_quarter_start, max_quarter_start) == TRUE, 15, 0)) %>%
   mutate(activity_date = as.Date(ACTIVITY_HOUR_DTTM, "%y-%m-%d"),
-         activity_hour = format(strptime(ACTIVITY_HOUR_DTTM, "%Y-%m-%d %H:%M:%S"), "%H"))
+         activity_hour = format(strptime(ACTIVITY_HOUR_DTTM, "%Y-%m-%d %H:%M:%S"), "%H")) %>%
+  left_join(active_minutes, 
+            by = c("activity_date", "WORKSTN_IDENTIFIER", "PAT_ENC_CSN_ID")) %>%
+  distinct() %>%
+  mutate(room_minutes = ifelse(between(quarter_start, pt_room_enter, pt_room_exit) == TRUE, 15, 0))
+  
 
 
 ## Locate Patient's Primary Room for Turns/Room ------------------------------
+### Calculate total room minutes spent per room per patient
 utilization_data <- utilization_data %>%
-  arrange(activity_date, PAT_ENC_CSN_ID, WORKSTN_IDENTIFIER, quarter_start) %>%
+  ungroup() %>%
+  arrange(PAT_ENC_CSN_ID, quarter_start) %>%
   group_by(activity_date, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID) %>%
-  mutate(total_minutes_by_room = sum(room_minutes)) %>%
+  mutate(total_room_minutes = sum(room_minutes, na.rm = TRUE)) %>% # calculate total room minutes by day, room and patient
   group_by(activity_date, PAT_ENC_CSN_ID) %>%
-  mutate(primary_room = ifelse(WORKSTN_IDENTIFIER[which.max(total_minutes_by_room)] == WORKSTN_IDENTIFIER, 1, 0)) %>%
+  mutate(primary_room = ifelse(WORKSTN_IDENTIFIER[which.max(total_room_minutes)] == WORKSTN_IDENTIFIER, 1, 0)) %>% 
   group_by(activity_date, primary_room, PAT_ENC_CSN_ID) %>%
   mutate(first_entered = row_number()) %>%
-  mutate(first_entered = ifelse(primary_room == 0, NA, 
+  mutate(first_entered = ifelse(primary_room == 0, NA,
                                 ifelse(room_minutes == 0, NA, first_entered))) %>%
   group_by(activity_date, PAT_ENC_CSN_ID) %>%
   mutate(first_entered = ifelse(first_entered[which.min(first_entered)] == first_entered, 1, NA))
@@ -556,26 +535,39 @@ room_utilization <- utilization_data %>%
   ungroup() %>%
   group_by(Campus, `Building Address`, `Floor/Suite`, 
            PRIM_DEPARTMENT_ID, PRIM_SITE, PRIM_DEPARTMENT_NAME, 
-           WORKSTN_IDENTIFIER, Room, `Type Name`, 
+           WORKSTN_IDENTIFIER, 
+           # Room, `Type Name`, 
            WORKSTN_OWNER, `Leased or Owned`, `Hospital or NonHospital`,
-           DEPARTMENT_NAME, PROV_NAME_WID,
-           activity_date, activity_hour, quarter_start) %>%
-  summarise(room_minutes = sum(room_minutes),
-            turns = sum(first_entered, na.rm = TRUE)) %>%
-  mutate(room_minutes = ifelse(room_minutes > 0, 15, 0)) %>%
+           DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
+           activity_date, activity_hour, active_quarter, room_minutes) %>%
+  summarise(turns = sum(first_entered, na.rm = TRUE)) %>%
   group_by(Campus, `Building Address`, `Floor/Suite`, 
            PRIM_DEPARTMENT_ID, PRIM_SITE, PRIM_DEPARTMENT_NAME, 
-           WORKSTN_IDENTIFIER, Room, `Type Name`, 
+           WORKSTN_IDENTIFIER, 
+           # Room, `Type Name`, 
            WORKSTN_OWNER, `Leased or Owned`, `Hospital or NonHospital`,
-           DEPARTMENT_NAME, PROV_NAME_WID,
+           DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
            activity_date, activity_hour) %>%
   summarise(room_minutes = sum(room_minutes),
             turns = sum(turns))
 
 
+
+## Calculate Total Rooms Assigned per Resource ---------------------------------
+room_utilization <- room_utilization %>%
+  mutate(session = ifelse(as.numeric(activity_hour) < 12, "AM",
+                          ifelse(as.numeric(activity_hour) >= 12 & as.numeric(activity_hour) < 17, "PM", "EVE"))) %>%
+  group_by(activity_date, session, PROV_NAME_WID, WORKSTN_IDENTIFIER) %>%
+  mutate(total_room_used_session = ifelse(row_number()==1, 1, 0))
+  
+```
+
+
+```{r Format Data for Oracle, echo = FALSE, warning = FALSE, message = FALSE}
+
 ## Fill in missing dates and hours ------------------------------------------
 fill_dates <- room_utilization %>%
-  dplyr::select(-c(room_minutes, turns)) %>%
+  dplyr::select(-c(DEPARTMENT_NAME, PROV_NAME_WID, room_minutes, turns)) %>%
   mutate(value = 1) %>%
   arrange(activity_date) %>%
   pivot_wider(names_from = activity_date,
@@ -612,13 +604,80 @@ room_utilization <- room_utilization %>%
          activity_day = format(as.Date(activity_date), "%a"))
 
 
-# room_utilization_subset <- room_utilization %>%
-#   filter(activity_yearmonth %in% c("2023-11", "2023-12"))
+
+
+
+# Export a temporary manual file --------------------------------------------
+# room_utilization_sample <- room_utilization %>%
+#   filter(as.Date(activity_date) >= as.Date("2023-12-01"))
 # 
-# save(room_utilization_subset, file = "Room Utilization Data Sample.RData")
+# save(room_utilization_sample, file = "Room Utilization Data Sample.RData")
 # 
 # require(openxlsx)
 # writexl::write_xlsx(room_utilization_subset, "Room Utilization Data Sample.xlsx")
+```
+
+
+```{r Write to Oracle, echo = FALSE, warning = FALSE, message = FALSE}
+
+#Establish Oracle Cloud connection
+conn3 <- dbConnect(odbc(), "OAO Cloud DB SoYoun",
+                  uid = "KWEONS01",
+                  pwd = "wEKMQpqm22*dvM")
+ 
+# ## Write Table in Oracle Database
+# dbWriteTable(conn = conn3, name = "Room_Utilization_Table_Test", value = test, row.names = FALSE)
+# 
+room_util_pull <- tbl(conn3, "ROOM_UTIL_DATA")
+room_util_pull_all <- room_util_pull %>%
+  collect()
+
+room_util_pull_all <- room_util_pull_all %>%
+  distinct()
+
+data_remaining <- anti_join(room_utilization_subset, room_util_pull_all)
+
+
+
+# Delete existing data from table in Oracle --------------------------
+# dbExecute(conn3, "TRUNCATE TABLE ROOM_UTIL_TEST")
+
+
+# Write Table to Oracle ----------------------------------------------
+
+batch_size <- 1000
+
+for (i in seq(1, nrow(data_remaining), by = batch_size)) {
+
+batch <- data_remaining[i:(i + batch_size - 1), ]
+
+dbWriteTable(conn = conn3, name = "ROOM_UTIL_DATA", value = batch, row.names = FALSE, append = TRUE)
+
+}
+
+
+ 
+batch_size <- 1000
+ 
+index_squence <- seq(1, nrow(monthly_vol), by = batch_size)
+ 
+for (i in index_squence) {
+  
+  if(i == max(index_squence)) {
+    batch <- monthly_vol[i:nrow(monthly_vol), ]
+  } else {
+    batch <- monthly_vol[i:(i + batch_size - 1), ]
+  }
+  
+  
+  #dbWriteTable(conn = conn3, name = "MONTHLY_VOL_DATA", value = batch, row.names = FALSE, append = TRUE)
+  
+  print(paste0("i is:", i))
+  print(batch)
+  
+}
+
+
 
 ```
 
