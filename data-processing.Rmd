@@ -1,0 +1,38 @@
+---
+title: "Untitled"
+output: html_document
+date: "2024-01-02"
+---
+
+```{r Workstation Mapping, echo = FALSE, warning = FALSE, message = FALSE}
+
+workstation_mapping <- read_excel(file.choose(), sheet = 1, col_names = TRUE, col_types = "text", na = "", skip = 0)
+workstation_mapping <- workstation_mapping %>% 
+  left_join(clarity_lws_tbl %>% 
+              filter(!is.na(ROOM_IDENTIFIER)) %>%
+              dplyr::select(WORKSTATION_ID, WORKSTN_IDENTIFIER, ROOM_IDENTIFIER, PRIM_DEPARTMENT_ID),
+            by = c("Workstation Identifier" = "WORKSTN_IDENTIFIER"), 
+            copy = TRUE) %>%
+  mutate()
+
+workstations_mapped <- unique((workstation_mapping %>% filter(!is.na(WORKSTATION_ID)))$WORKSTATION_ID)
+
+
+workstation_mapping <- workstation_mapping %>%
+  left_join(clarity_lws_tbl %>%
+              dplyr::select(WORKSTATION_ID, WORKSTN_IDENTIFIER, ROOM_IDENTIFIER, PRIM_DEPARTMENT_ID),
+            by = c("WORKSTATION_ID"), 
+            copy = TRUE) 
+
+workstation_mapping <- workstation_mapping %>%
+  left_join(access_raw_tbl %>% 
+              group_by(DEPARTMENT_ID, DEPARTMENT_NAME, SITE) %>%
+              summarise(total = n()) %>%
+              dplyr::select(-total),
+            by = c("PRIM_DEPARTMENT_ID.y" = "DEPARTMENT_ID"),
+            copy = TRUE) %>%
+  rename("PRIM_DEPARTMENT_NAME" = "DEPARTMENT_NAME",
+         "PRIM_SITE" = "SITE") 
+
+```
+
