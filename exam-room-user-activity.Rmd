@@ -601,6 +601,50 @@ room_util_merged_query <- glue("CREATE TABLE ROOM_UTILIZATION_MERGED AS
 ```
 
 
+```{r Room Assignment Value, echo = FALSE, warning = FALSE, message = FALSE}
+
+## updating workstation owner based on moving workstations and their start and end dates
+
+updated_workstn_owner_drop <- glue("DROP TABLE PROD_ROOM_UTILIZATION_TABLE")
+updated_workstn_owner_query <- glue("CREATE TABLE PROD_ROOM_UTILIZATION_TABLE AS
+                               SELECT a.CAMPUS,
+                               a.BUILDING_ADDRESS,
+                               a.FLOOR_SUITE,
+                               a.DEPARTMENT_ID,
+                               a.PRIM_SITE,
+                               a.DEPARTMENT_NAME,
+                               a.WORKSTN_IDENTIFIER,
+                               a.LEASED_OR_OWNED,
+                               a.HOSPITAL_OR_NONHOSPITAL,
+                               a.PROV_NAME_WID,
+                               a.PROV_TYPE_SCHEDULING,
+                               a.ACTIVITY_DATE,
+                               a.ACTIVITY_HOUR,
+                               a.TURNS_PRIMARY_ROOM,
+                               a.TURNS_ALL_ROOMS,
+                               a.ROOM_MINUTES,
+                               a.SESSION_TYPE,
+                               a.TOTAL_ROOM_USED_SESSION,
+                               a.ROOM_ASSIGNMENT_VALUE,
+                               a.ROOM,
+                               a.ROOM_TYPE,
+                               a.VISIT_METHOD,
+                               a.VISIT_TYPE,
+                               b.WORKSTN_OWNER
+                               FROM
+                              (SELECT * FROM ROOM_UTILIZATION_TABLE) a
+                               LEFT JOIN 
+                              (SELECT WORKSTN_IDENTIFIER, WORKSTN_OWNER, START_DATE, END_DATE FROM TEMP_WORKSTATION_MAPPING) b
+                               ON a.WORKSTN_IDENTIFIER = b.WORKSTN_IDENTIFIER
+                               AND EXTRACT(MONTH FROM a.ACTIVITY_DATE) >= EXTRACT(MONTH FROM b.START_DATE)
+                               AND EXTRACT(YEAR FROM a.ACTIVITY_DATE) >= EXTRACT(YEAR FROM b.START_DATE)
+                               AND EXTRACT(MONTH FROM a.ACTIVITY_DATE) <= EXTRACT(MONTH FROM b.END_DATE)
+                               AND EXTRACT(YEAR FROM a.ACTIVITY_DATE) <= EXTRACT(YEAR FROM b.END_DATE);
+                              ")
+
+```
+
+
 ```{r Write to Oracle, echo = FALSE, warning = FALSE, message = FALSE}
 
 ## Grouped Table execution
