@@ -1,111 +1,3 @@
----
-output:
-  html_document:
-    toc: no
-    toc_depth: 6
-    toc_float:
-      collapsed: yes
-    fig_width: 7
-    fig_height: 6
----
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
-```
-
-<style type="text/css">
-div.main-container {
-  max-width: 2000px;
-  margin-left: 0;
-  margin-right: auto;
-}
-</style>
-
-<style>
-.tocify {
-color: black;
-}
-<!-- } -->
-<!-- .tocify .tocify-header { -->
-<!--     position: fixed; -->
-<!--     <!-- top: 50px; --> -->
-<!--     left: 50px; -->
-<!--     width: 350px; -->
-<!--     <!-- border: solid 3px black; --> -->
-<!--     <!-- height: 200px; --> -->
-<!--  border: none; -->
-<!-- } -->
-.tocify .tocify-header .active {
-color: white;
-background: #d80b8c;
-font-weight: bold;
-}
-<!-- .tocify .tocify-item { -->
-<!-- background: white; -->
-<!-- color: black; -->
-<!--  border: none; -->
-<!-- } -->
-</style>
-
-
-<style>
-  .nav-pills>li>a:hover, .nav-pills>li>a:focus, .nav-pills>li.active>a,     .nav-pills>li.active>a:hover, .nav-pills>li.active>a:focus{
-     background-color: #212070;
-     }
-</style>
-
-<style>
-.container { width: 1800px; }
-h2 {
-  background-color: #dddedd;
-  color: black;
-  text-indent: 20px;
-  <!-- font-weight: bold; -->
-}
-h3 {
-  background-color: #f2f2f2;
-  color: black;
-  text-indent: 20px;
-  <!-- font-weight: bold; -->
-}
-h4 {
-  <!-- background-color: #dddedd; -->
-  <!-- color: black; -->
-  text-indent: 50px;
-  <!-- font-weight: bold; -->
-}
-</style>
-
-<style>
-.blackbox {
-  padding: 1em;
-  background: white;
-  color: black;
-  border: 2px solid #7f7f7f;
-  width: 100%;
-  position: center;
-  align: center;
-  margin: 0px auto;
-}
-.center {
-  text-align: left;
-  margin: 0px auto;
-}
-</style>
-
-
-<!-- ```{css toc-content, echo = FALSE} -->
-<!-- #TOC { -->
-<!--   right: 270px; -->
-<!--   margin: 20px 0px 25px 0px; -->
-<!-- } -->
-
-<!-- .main-container { -->
-<!--     margin-left: 200px; -->
-<!-- } -->
-<!-- ``` -->
-
-
 ```{r Load Packages, echo = FALSE, warning = FALSE, message = FALSE}
 # # Load packages -----------------------------------------------------------------------------------
 suppressMessages({
@@ -208,144 +100,26 @@ suppressMessages({
 ```
 
 
-```{r Graph asthetics, echo = FALSE, warning = FALSE, message = FALSE}
-### Color Functions for Graphs ============================================================
-# Mount Sinai corporate colors "USE THIS TO ADD COLORS"
-MountSinai_colors <- c(
-  `dark purple`  = "#212070",
-  `dark pink`    = "#d80b8c",
-  `dark blue`    = "#00aeef",
-  `dark grey`    = "#7f7f7f",
-  `yellow`       = "#ffc000",
-  `purple`       = "#7030a0",
-  `med purple`   = "#5753d0",
-  `med pink`     = "#f75dbe",
-  `med blue`     = "#5cd3ff",
-  `med grey`     = "#a5a7a5",
-  `light purple` = "#c7c6ef",
-  `light pink`   = "#fcc9e9",
-  `light blue`   = "#c9f0ff",
-  `light grey`   = "#dddedd"
-  )
-# Function to extract Mount Sinai colors as hex codes
-# Use Character names of MountSinai_colors
-MountSinai_cols <- function(...) {
-  cols <- c(...)
-  
-  if (is.null(cols))
-    return (MountSinai_colors)
-  
-  MountSinai_colors[cols]
-}
-# Color Function that can be used to call all colors is "MountSinai_cols()"
-# Use in ggplot 
-  #MountSinai_cols()       # will provide all colors and their hex codes in a table 
-  #MountSinai_cols("pink") # will provide color name and the hex code for the pink color
-# Create palettes 
-MountSinai_palettes <- list(
-  `all`   = MountSinai_cols("dark purple","dark pink","dark blue","dark grey",
-                            "med purple","med pink","med blue","med grey", 
-                            "light purple","light pink","light blue","light grey"),
-  
-  `main`  = MountSinai_cols("dark purple","dark pink","dark blue","dark grey"),
-  
-  `purple`  = MountSinai_cols("dark purple","med purple","light purple"),
-  
-  `pink`  = MountSinai_cols("dark pink","med pink","light pink"),
-  
-  `blue`  = MountSinai_cols("dark blue", "med blue", "light blue"),
-  
-  `grey`  = MountSinai_cols("dark grey", "med grey", "light grey"),
-  
-  `purpleGrey` = MountSinai_cols("dark purple", "dark grey"),
-  
-  `pinkBlue` = MountSinai_cols("dark pink", "dark blue")
-  
-)
-# MountSinai_palettes
-# Return function to interpolate a Mount Sinai color palette
-# default value is the main palette, reverse = True will change the order
-MountSinai_pal <- function(palette = "all", reverse = FALSE, ...) {
-  pal <- MountSinai_palettes[[palette]]
-  
-  if (reverse) pal <- rev(pal)
-  
-  colorRampPalette(pal, ...)
-}
-# Scale Function for ggplot can be used instead of scale_color_manual
-scale_color_MountSinai <- function(palette = "all", discrete = TRUE, reverse = FALSE, ...) {
-  pal <- MountSinai_pal(palette = palette, reverse = reverse)
-  
-  if (discrete) {
-    discrete_scale("colour", paste0("MountSinai_", palette), palette = pal, ...)
-  } else {
-    scale_color_gradientn(colours = pal(256), ...)
-  }
-}
-# Scale Fill for ggplot insetead of scale_fill_manual 
-scale_fill_MountSinai <- function(palette = "all", discrete = TRUE, reverse = FALSE, ...) {
-  pal <- MountSinai_pal(palette = palette, reverse = reverse)
-  if (discrete) {
-    discrete_scale("fill", paste0("MountSinai_", palette), palette = pal, ...)
-  } else {
-    scale_fill_gradientn(colours = pal(256), ...)
-  }
-}
-# Use in ggplot 
-  # scale_color_MountSinai("main")
-```
-
-
-```{r Establish Connection, echo = FALSE, warning = FALSE, message = FALSE}
-
-# Connection to Oracle DB ------------------------------------------------------
-conn1 <- dbPool(drv = odbc(), dsn = "OAO Cloud DB SoYoun", timeout = 30)
-conn2 <- dbConnect(odbc(), 
-                  "Clarity_prod", 
-                  uid = "kweons01" , 
-                  pwd = "kweons01123$")
-
-```
-
-
-```{r Report Variables, echo = FALSE, warning = FALSE, message = FALSE}
-
-#day_order <- c("Mon","Tue","Wed","Thu","Fri","Sat","Sun")
-#hour_order <- as.vector(seq(7,20))
-#visit_capacity_order <- c(paste0("visit_capacity_",4:10))
-
-#report_run_date <- Sys.Date()
-
-```
-
-
 ```{r Workstation Mapping, echo = FALSE, warning = FALSE, message = FALSE}
 
-workstation_drop <- glue("DROP TABLE COMBINED_WORKSTATION_MAPPING")
-workstation_query <- glue("CREATE TABLE COMBINED_WORKSTATION_MAPPING AS
+### Join for workstation ID and primary department ID, department name & site details
+
+workstation_drop <- glue("DROP TABLE PROD_WORKSTATION_MAPPING")
+workstation_query <- glue("CREATE TABLE PROD_WORKSTATION_MAPPING AS
                           SELECT a.*, b.WORKSTATION_ID, b.PRIM_DEPARTMENT_ID 
                           FROM
-                          ((SELECT * FROM WORKSTATION_MAPPING) a
+                          (SELECT * FROM DEV_WORKSTATION_MAPPING) a
                           LEFT JOIN (SELECT * FROM CLARITY_LWS) b
-                          ON a.WORKSTN_IDENTIFIER = b.WORKSTN_IDENTIFIER)
+                          ON a.WORKSTN_IDENTIFIER = b.WORKSTN_IDENTIFIER;
                           ")
 
 
-workstation_modified_drop <- glue("DROP TABLE MODIFIED_WORKSTATION_MAPPING")
-workstation_modified_query <- glue("CREATE TABLE MODIFIED_WORKSTATION_MAPPING AS
-                                    SELECT a.*, b.SITE AS PRIM_SITE, b.PRIM_DEPARTMENT_NAME
-                                    FROM COMBINED_WORKSTATION_MAPPING a
-                                    LEFT JOIN 
-                                    (SELECT CAST(DEPARTMENT_ID AS VARCHAR(255)) AS DEPARTMENT_ID, SITE, DEPARTMENT_NAME AS PRIM_DEPARTMENT_NAME
-                                    FROM MV_DM_PATIENT_ACCESS 
-                                    GROUP BY DEPARTMENT_ID, SITE, DEPARTMENT_NAME) b
-                                    ON CAST(a.PRIM_DEPARTMENT_ID AS VARCHAR(255)) = b.DEPARTMENT_ID
-                                   ")
+### only filtering for workstations that are mapped in Epic
 
 workstation_mapping_subset_drop <- glue("DROP TABLE WORKSTATION_MAPPING_SUBSET")
 workstation_mapping_subset_query <- glue("CREATE TABLE WORKSTATION_MAPPING_SUBSET AS
                                          SELECT DISTINCT WORKSTATION_ID
-                                         FROM MODIFIED_WORKSTATION_MAPPING
+                                         FROM PROD_WORKSTATION_MAPPING
                                          WHERE WORKSTN_IDENTIFIER IS NOT NULL")
 
 ```
@@ -362,20 +136,21 @@ user_activity_drop <- glue("DROP TABLE USER_ACTIVITY_HOUR_TABLE")
 user_activity_query <- glue("CREATE TABLE USER_ACTIVITY_HOUR_TABLE AS
                             SELECT i.*, j.CAMPUS, j.BUILDING_ADDRESS, j.FLOOR_SUITE, j.ROOM, j.DEPT_NO,
                             j.WORKSTN_IDENTIFIER, j.TYPE_NAME, j.WORKSTN_OWNER, j.LEASED_OR_OWNED, j.HOSPITAL_OR_NONHOSPITAL,
-                            j.PRIM_DEPARTMENT_ID, j.PRIM_DEPARTMENT_NAME, j.PRIM_SITE, 
+                            j.PRIM_DEPARTMENT_ID, j.WORKSTN_NOTES, j.SQR_FT, j.OUTOFSERVICE_OR_UNDERCONSTRUCTION, j.LEASE_START_DATE,
+                            j.LEASE_END_DATE, j.ASSIGN_START_DATE, j.ASSIGN_END_DATE,
                             CASE WHEN TO_CHAR(i.ACTIVITY_HOUR_DTTM, 'YYYY-MM-DD') = TO_CHAR(i.CONTACT_DATE, 'YYYY-MM-DD') THEN 'Yes' ELSE 'No' END AS VALID_ACTIVITY
                             FROM
                             (SELECT g.*, h.PROV_TYPE_SCHEDULING
                             FROM
                             (SELECT e.*, f.DEPARTMENT_ID, f.DEPARTMENT_NAME, f.PROV_NAME_WID, f.PROV_ID_SCHEDULING, f.SITE, 
                             f.DEPT_SPECIALTY_NAME, f.LOC_NAME, f.CONTACT_DATE, f.DERIVED_STATUS_DESC, f.CHECKIN_DTTM, f.ROOMED_DTTM, f.VISIT_END_DTTM,
-                            f.CHECKOUT_DTTM, f.CYCLE_TIME_MINUTES, f.TIME_IN_ROOM_MINUTES, f.MRN, f.APPT_DTTM
+                            f.CHECKOUT_DTTM, f.CYCLE_TIME_MINUTES, f.TIME_IN_ROOM_MINUTES, f.MRN, f.APPT_DTTM, f.VISIT_METHOD, f.VISIT_GROUP_NUM
                             FROM
                             (SELECT c.*, d.PROV_ID_USER, d.PROV_TYPE_USER, d.PROV_NAME_USER
                             FROM
                             (SELECT a.* FROM 
-                            ((SELECT * FROM UAL_ACTIVITY_HOURS WHERE TO_CHAR(ACTIVITY_HOUR_DTTM,'YYYY-MM-DD') = '2024-03-03') a
-                            INNER JOIN (SELECT * FROM WORKSTATION_MAPPING_SUBSET) b
+                            ((SELECT * FROM UAL_ACTIVITY_HOURS WHERE TO_CHAR(ACTIVITY_HOUR_DTTM,'YYYY-MM-DD') = '2024-03-04') a
+                            LEFT JOIN (SELECT * FROM PROD_WORKSTATION_MAPPING) b
                             ON a.WORKSTATION_ID = b.WORKSTATION_ID)) c
                             LEFT JOIN 
                             (SELECT USER_ID, PROV_ID AS PROV_ID_USER, PROV_NAME AS PROV_NAME_USER, PROV_TYPE AS PROV_TYPE_USER FROM CLARITY_SER) d
@@ -384,7 +159,7 @@ user_activity_query <- glue("CREATE TABLE USER_ACTIVITY_HOUR_TABLE AS
                             (SELECT PAT_ENC_CSN_ID, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_ID AS PROV_ID_SCHEDULING,
                             SITE, DEPT_SPECIALTY_NAME, LOC_NAME, CONTACT_DATE, DERIVED_STATUS_DESC,
                             CHECKIN_DTTM, ROOMED_DTTM, VISIT_END_DTTM, CHECKOUT_DTTM, CYCLE_TIME_MINUTES, TIME_IN_ROOM_MINUTES,
-                            MRN, APPT_DTTM
+                            MRN, APPT_DTTM, VISIT_METHOD, VISIT_GROUP_NUM
                             FROM MV_DM_PATIENT_ACCESS) f
                             ON e.PAT_ENC_CSN_ID = f.PAT_ENC_CSN_ID) g
                             LEFT JOIN 
@@ -393,53 +168,11 @@ user_activity_query <- glue("CREATE TABLE USER_ACTIVITY_HOUR_TABLE AS
                             LEFT JOIN 
                             (SELECT CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, ROOM, DEPT_NO,
                             WORKSTN_IDENTIFIER, TYPE_NAME, WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL,
-                            WORKSTATION_ID, PRIM_DEPARTMENT_ID, PRIM_DEPARTMENT_NAME, PRIM_SITE 
-                            FROM MODIFIED_WORKSTATION_MAPPING) j
+                            WORKSTATION_ID, PRIM_DEPARTMENT_ID, WORKSTN_NOTES, SQR_FT, OUTOFSERVICE_OR_UNDERCONSTRUCTION, LEASE_START_DATE,
+                            LEASE_END_DATE, ASSIGN_START_DATE, ASSIGN_END_DATE
+                            FROM PROD_WORKSTATION_MAPPING) j
                             ON i.WORKSTATION_ID = j.WORKSTATION_ID
-                            WHERE CASE WHEN TO_CHAR(i.ACTIVITY_HOUR_DTTM, 'YYYY-MM-DD') = TO_CHAR(i.CONTACT_DATE, 'YYYY-MM-DD') THEN 'Yes' ELSE 'No' END = 'Yes'
-                            ")
-
-
-user_activity_drop_test <- glue("DROP TABLE USER_ACTIVITY_HOUR_TABLE_TEST")
-user_activity_query_test <- glue("CREATE TABLE USER_ACTIVITY_HOUR_TABLE_TEST AS
-                            SELECT i.*, j.CAMPUS, j.BUILDING_ADDRESS, j.FLOOR_SUITE, j.ROOM, j.DEPT_NO,
-                            j.WORKSTN_IDENTIFIER, j.TYPE_NAME, j.WORKSTN_OWNER, j.LEASED_OR_OWNED, j.HOSPITAL_OR_NONHOSPITAL,
-                            j.PRIM_DEPARTMENT_ID, j.PRIM_DEPARTMENT_NAME, j.PRIM_SITE, 
-                            CASE WHEN TO_CHAR(i.ACTIVITY_HOUR_DTTM, 'YYYY-MM-DD') = TO_CHAR(i.CONTACT_DATE, 'YYYY-MM-DD') THEN 'Yes' ELSE 'No' END AS VALID_ACTIVITY
-                            FROM
-                            (SELECT g.*, h.PROV_TYPE_SCHEDULING
-                            FROM
-                            (SELECT e.*, f.DEPARTMENT_ID, f.DEPARTMENT_NAME, f.PROV_NAME_WID, f.PROV_ID_SCHEDULING, f.SITE, 
-                            f.DEPT_SPECIALTY_NAME, f.LOC_NAME, f.CONTACT_DATE, f.DERIVED_STATUS_DESC, f.CHECKIN_DTTM, f.ROOMED_DTTM, f.VISIT_END_DTTM,
-                            f.CHECKOUT_DTTM, f.CYCLE_TIME_MINUTES, f.TIME_IN_ROOM_MINUTES, f.MRN, f.APPT_DTTM
-                            FROM
-                            (SELECT c.*, d.PROV_ID_USER, d.PROV_TYPE_USER, d.PROV_NAME_USER
-                            FROM
-                            (SELECT a.* FROM 
-                            ((SELECT * FROM UAL_ACTIVITY_HOURS WHERE TO_CHAR(ACTIVITY_HOUR_DTTM,'YYYY-MM-DD') >= '2024-03-01' AND 
-                            TO_CHAR(ACTIVITY_HOUR_DTTM,'YYYY-MM-DD') <= '2024-03-02') a 
-                            INNER JOIN (SELECT * FROM WORKSTATION_MAPPING_SUBSET) b
-                            ON a.WORKSTATION_ID = b.WORKSTATION_ID)) c
-                            LEFT JOIN 
-                            (SELECT USER_ID, PROV_ID AS PROV_ID_USER, PROV_NAME AS PROV_NAME_USER, PROV_TYPE AS PROV_TYPE_USER FROM CLARITY_SER) d
-                            ON c.USER_ID = d.USER_ID) e
-                            LEFT JOIN 
-                            (SELECT PAT_ENC_CSN_ID, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_ID AS PROV_ID_SCHEDULING,
-                            SITE, DEPT_SPECIALTY_NAME, LOC_NAME, CONTACT_DATE, DERIVED_STATUS_DESC,
-                            CHECKIN_DTTM, ROOMED_DTTM, VISIT_END_DTTM, CHECKOUT_DTTM, CYCLE_TIME_MINUTES, TIME_IN_ROOM_MINUTES,
-                            MRN, APPT_DTTM
-                            FROM MV_DM_PATIENT_ACCESS) f
-                            ON e.PAT_ENC_CSN_ID = f.PAT_ENC_CSN_ID) g
-                            LEFT JOIN 
-                            (SELECT PROV_ID, PROV_TYPE AS PROV_TYPE_SCHEDULING FROM CLARITY_SER) h
-                            ON g.PROV_ID_SCHEDULING = h.PROV_ID) i
-                            LEFT JOIN 
-                            (SELECT CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, ROOM, DEPT_NO,
-                            WORKSTN_IDENTIFIER, TYPE_NAME, WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL,
-                            WORKSTATION_ID, PRIM_DEPARTMENT_ID, PRIM_DEPARTMENT_NAME, PRIM_SITE 
-                            FROM MODIFIED_WORKSTATION_MAPPING) j
-                            ON i.WORKSTATION_ID = j.WORKSTATION_ID
-                            WHERE CASE WHEN TO_CHAR(i.ACTIVITY_HOUR_DTTM, 'YYYY-MM-DD') = TO_CHAR(i.CONTACT_DATE, 'YYYY-MM-DD') THEN 'Yes' ELSE 'No' END = 'Yes'
+                            WHERE CASE WHEN TO_CHAR(i.ACTIVITY_HOUR_DTTM, 'YYYY-MM-DD') = TO_CHAR(i.CONTACT_DATE, 'YYYY-MM-DD') THEN 'Yes' ELSE 'No' END = 'Yes';
                             ")
 
 
@@ -449,8 +182,8 @@ user_activity_query_test <- glue("CREATE TABLE USER_ACTIVITY_HOUR_TABLE_TEST AS
 ```{r Calculate Room Minutes, echo = FALSE, warning = FALSE, message = FALSE}
 
 ## Calculate Minutes in Room ----------------------
-utilization_drop <- glue("DROP TABLE UTILIZATION_TABLE")
-utilization_query <- glue("CREATE TABLE UTILIZATION_TABLE AS
+utilization_drop <- glue("DROP TABLE DEV_UTILIZATION_TABLE")
+utilization_query <- glue("CREATE TABLE DEV_UTILIZATION_TABLE AS
                            SELECT a.*, DENSE_RANK() OVER (PARTITION BY WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID ORDER BY ACTIVITY_HOUR_DTTM) AS UNIQUE_ID,
                            CASE 
                            WHEN ACTIVE_QUARTER = 'Q1' THEN ACTIVITY_HOUR_DTTM
@@ -467,61 +200,73 @@ utilization_query <- glue("CREATE TABLE UTILIZATION_TABLE AS
                            ELSE NULL
                            END AS QUARTER_END
                            FROM
-                           (SELECT ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
-                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, PRIM_DEPARTMENT_NAME, PRIM_SITE,
-                           CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL,
+                           (SELECT ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, SITE, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
+                           VISIT_METHOD, VISIT_GROUP_NUM,
+                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE,
+                           WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL, WORKSTN_NOTES, SQR_FT, OUTOFSERVICE_OR_UNDERCONSTRUCTION, 
+                           LEASE_START_DATE, LEASE_END_DATE, ASSIGN_START_DATE, ASSIGN_END_DATE,
                            ACTIVE_QUARTER, SUM(ACTIVE_SECONDS) AS ACTIVE_SECONDS
                            FROM
                            (
-                           SELECT ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
-                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, PRIM_DEPARTMENT_NAME, PRIM_SITE,
-                           CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL,
+                           SELECT ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, SITE, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
+                           VISIT_METHOD, VISIT_GROUP_NUM,
+                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, 
+                           WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL, WORKSTN_NOTES, SQR_FT, OUTOFSERVICE_OR_UNDERCONSTRUCTION, 
+                           LEASE_START_DATE, LEASE_END_DATE, ASSIGN_START_DATE, ASSIGN_END_DATE,
                            'Q1' AS ACTIVE_QUARTER, NUMBER_OF_SECONDS_ACTIVE_Q1 AS ACTIVE_SECONDS
                            FROM USER_ACTIVITY_HOUR_TABLE
                            UNION ALL
-                           SELECT ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
-                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, PRIM_DEPARTMENT_NAME, PRIM_SITE,
-                           CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL,                           
+                           SELECT ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, SITE, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
+                           VISIT_METHOD, VISIT_GROUP_NUM,
+                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, 
+                           WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL, WORKSTN_NOTES, SQR_FT, OUTOFSERVICE_OR_UNDERCONSTRUCTION, 
+                           LEASE_START_DATE, LEASE_END_DATE, ASSIGN_START_DATE, ASSIGN_END_DATE,                          
                            'Q2' AS ACTIVE_QUARTER, NUMBER_OF_SECONDS_ACTIVE_Q2 AS ACTIVE_SECONDS
                            FROM USER_ACTIVITY_HOUR_TABLE
                            UNION ALL
-                           SELECT ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
-                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, PRIM_DEPARTMENT_NAME, PRIM_SITE,
-                           CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL,
+                           SELECT ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, SITE, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
+                           VISIT_METHOD, VISIT_GROUP_NUM,
+                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, 
+                           WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL, WORKSTN_NOTES, SQR_FT, OUTOFSERVICE_OR_UNDERCONSTRUCTION, 
+                           LEASE_START_DATE, LEASE_END_DATE, ASSIGN_START_DATE, ASSIGN_END_DATE,
                            'Q3' AS ACTIVE_QUARTER, NUMBER_OF_SECONDS_ACTIVE_Q3 AS ACTIVE_SECONDS
                            FROM USER_ACTIVITY_HOUR_TABLE
                            UNION ALL
-                           SELECT ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
-                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, PRIM_DEPARTMENT_NAME, PRIM_SITE,
-                           CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL,
+                           SELECT ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, SITE, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
+                           VISIT_METHOD, VISIT_GROUP_NUM,
+                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, 
+                           WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL, WORKSTN_NOTES, SQR_FT, OUTOFSERVICE_OR_UNDERCONSTRUCTION, 
+                           LEASE_START_DATE, LEASE_END_DATE, ASSIGN_START_DATE, ASSIGN_END_DATE,
                            'Q4' AS ACTIVE_QUARTER, NUMBER_OF_SECONDS_ACTIVE_Q4 AS ACTIVE_SECONDS
                            FROM USER_ACTIVITY_HOUR_TABLE
                            )
                            GROUP BY 
-                           ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
-                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, PRIM_DEPARTMENT_NAME, PRIM_SITE,
-                           CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL,
+                           ACTIVITY_HOUR_DTTM, PAT_ENC_CSN_ID, SITE, DEPARTMENT_ID, DEPARTMENT_NAME, PROV_NAME_WID, PROV_TYPE_SCHEDULING,
+                           VISIT_METHOD, VISIT_GROUP_NUM,
+                           WORKSTN_IDENTIFIER, ROOM, TYPE_NAME, PRIM_DEPARTMENT_ID, CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, 
+                           WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL, WORKSTN_NOTES, SQR_FT, OUTOFSERVICE_OR_UNDERCONSTRUCTION, 
+                           LEASE_START_DATE, LEASE_END_DATE, ASSIGN_START_DATE, ASSIGN_END_DATE,
                            ACTIVE_QUARTER) a
-                           ORDER BY ACTIVITY_HOUR_DTTM, ACTIVE_QUARTER, WORKSTN_IDENTIFIER
+                           ORDER BY ACTIVITY_HOUR_DTTM, ACTIVE_QUARTER, WORKSTN_IDENTIFIER;
                           ")
 
 
 ## Assign 15 minutes to active quarters by hour ------------------------------
 ### Start and End of quarter by hour, room and encounter ID 
-active_minutes_drop <- glue("DROP TABLE ACTIVE_MINUTES")
-active_minutes_query <- glue("CREATE TABLE ACTIVE_MINUTES AS
+active_minutes_drop <- glue("DROP TABLE DEV_ACTIVE_MINUTES")
+active_minutes_query <- glue("CREATE TABLE DEV_ACTIVE_MINUTES AS
                             SELECT TO_CHAR(ACTIVITY_HOUR_DTTM,'YYYY-MM-DD') AS ACTIVITY_DATE, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID, 
                             MIN(QUARTER_START) AS PT_ROOM_ENTER, MAX(QUARTER_END) AS PT_ROOM_EXIT
-                            FROM UTILIZATION_TABLE
+                            FROM DEV_UTILIZATION_TABLE
                             WHERE ACTIVE_SECONDS>0
-                            GROUP BY TO_CHAR(ACTIVITY_HOUR_DTTM,'YYYY-MM-DD'), WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID
+                            GROUP BY TO_CHAR(ACTIVITY_HOUR_DTTM,'YYYY-MM-DD'), WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID;
                             ")
 
 
 
 ### Merge with active_minutes_table
-merged_utilization_drop <- glue("DROP TABLE MERGED_UTILIZATION_TABLE")
-merged_utilization_query <- glue("CREATE TABLE MERGED_UTILIZATION_TABLE AS
+merged_utilization_drop <- glue("DROP TABLE DEV_MERGED_UTILIZATION_TABLE")
+merged_utilization_query <- glue("CREATE TABLE DEV_MERGED_UTILIZATION_TABLE AS
                                      SELECT DISTINCT d.*,
                                      CASE WHEN QUARTER_START BETWEEN PT_ROOM_ENTER AND PT_ROOM_EXIT THEN 15 ELSE 0 END AS ROOM_MINUTES
                                      FROM
@@ -530,43 +275,129 @@ merged_utilization_query <- glue("CREATE TABLE MERGED_UTILIZATION_TABLE AS
                                      (SELECT a.*, 
                                      TO_CHAR(ACTIVITY_HOUR_DTTM, 'YYYY-MM-DD') AS ACTIVITY_DATE, 
                                      TO_CHAR(ACTIVITY_HOUR_DTTM, 'HH24') AS ACTIVITY_HOUR
-                                     FROM (SELECT DISTINCT * FROM UTILIZATION_TABLE) a) c
-                                     LEFT JOIN (SELECT * FROM ACTIVE_MINUTES) b
+                                     FROM (SELECT DISTINCT * FROM DEV_UTILIZATION_TABLE) a) c
+                                     LEFT JOIN (SELECT * FROM DEV_ACTIVE_MINUTES) b
                                      ON c.ACTIVITY_DATE = b.ACTIVITY_DATE AND 
                                      c.WORKSTN_IDENTIFIER = b.WORKSTN_IDENTIFIER AND
-                                     c.PAT_ENC_CSN_ID = b.PAT_ENC_CSN_ID) d
+                                     c.PAT_ENC_CSN_ID = b.PAT_ENC_CSN_ID) d;
                                     ")
 
 
 
 ## Locate Patient's Primary Room for Turns/Room ------------------------------
 ### Calculate total room minutes spent per room per patient
+### Identify the primary room for each patient, Determine the first entry into the primary room, Final selection to handle the conditional logic for the first entered primary room
 
-processed_utilization_drop <- glue("DROP TABLE PROCESSED_UTILIZATION_TABLE")
-processed_utilization_query <-glue("CREATE TABLE PROCESSED_UTILIZATION_TABLE AS
-                                   WITH TOTALROOMMINUTES AS (
-                                   SELECT ACTIVITY_DATE, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID, SUM(ROOM_MINUTES) AS TOTAL_ROOM_MINUTES
-                                   FROM MERGED_UTILIZATION_TABLE
-                                   GROUP BY ACTIVITY_DATE, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID
-                                   ),
-                                   PRIMARYROOM AS (
-                                   SELECT ACTIVITY_DATE, PAT_ENC_CSN_ID,
-                                   CASE WHEN MAX(TOTAL_ROOM_MINUTES) OVER PARTITION BY ACTIVITY_DATE, PAT_ENC_CSN_ID) = TOTAL_ROOM_MINUTES THEN 1 ELSE 0 END AS PRIMARY_ROOM
-                                   FROM TOTALROOMMINUTES
-                                   ),
-                                   FIRSTENTERED AS (
-                                   SELECT ACTIVITY_DATE, PAT_ENC_CSN_ID,
-                                   ROW_NUMBER() OVER (PARTITION BY ACTIVITY_DATE, PAT_ENC_CSN_ID ORDER BY PAT_ENC_CSN_ID) AS FIRST_ENTERED
-                                   FROM MERGED_UTILIZATION_DATA
-                                   )
-                                   SELECT u.*, p.PRIMARY_ROOM,
-                                   CASE WHEN f.FIRST_ENTERED = 1 THEN 1 ELSE NULL END AS FIRST_ENTERED
-                                   FROM MERGED_UTILIZATION_DATA u
-                                   JOIN PRIMARYROOM p on u.ACTIVITY_DATE = p.ACTIVITY_DATE AND u.PAT_ENC_CSN_ID = p.PAT_ENC_CSN_ID
-                                   JOIN FIRSTENTERED f on u.ACTIVITY_DATE = f.ACTIVITY_DATE AND u.PAT_ENC_CSN_ID = f.PAT_ENC_CSN_ID
+first_processed_utilization_drop <- glue("DROP TABLE DEV_01_PROCESSED_UTILIZATION_TABLE")
+first_processed_utilization_query <-glue("CREATE TABLE DEV_01_PROCESSED_UTILIZATION_TABLE AS
+                                   SELECT c.*,
+                                   CASE WHEN c.TOTAL_ROOM_MINUTES = MAX(c.TOTAL_ROOM_MINUTES) OVER (PARTITION BY c.ACTIVITY_DATE, c.PAT_ENC_CSN_ID) THEN 1 ELSE 0 
+                                   END AS PRIMARY_ROOM
+                                   FROM
+                                   (SELECT a.*, b.TOTAL_ROOM_MINUTES
+                                    FROM
+                                   (SELECT * FROM DEV_MERGED_UTILIZATION_TABLE) a
+                                    LEFT JOIN 
+                                  (SELECT ACTIVITY_DATE, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID, SUM(ROOM_MINUTES) AS TOTAL_ROOM_MINUTES
+                                   FROM DEV_MERGED_UTILIZATION_TABLE
+                                   GROUP BY ACTIVITY_DATE, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID) b
+                                   ON a.ACTIVITY_DATE = b.ACTIVITY_DATE AND
+                                   a.WORKSTN_IDENTIFIER = b.WORKSTN_IDENTIFIER AND
+                                   a.PAT_ENC_CSN_ID = b.PAT_ENC_CSN_ID) c;
                                    ")
 
-### to be continued here
+
+second_processed_utilization_drop <-glue("DROP TABLE DEV_02_PROCESSED_UTILIZATION_TABLE")
+second_processed_utilization_query <- glue("CREATE TABLE DEV_02_PROCESSED_UTILIZATION_TABLE AS
+                                           SELECT a.*,
+                                           CASE WHEN a.ROOM_MINUTES = 0 THEN NULL
+                                           ELSE a.ROW_NUMBER END AS UPDATED_ROW_NUMBER
+                                           FROM
+                                           (SELECT ACTIVITY_DATE, QUARTER_START, QUARTER_END, PAT_ENC_CSN_ID, PRIMARY_ROOM, ROOM_MINUTES,
+                                           ROW_NUMBER() OVER (PARTITION BY ACTIVITY_DATE, PAT_ENC_CSN_ID, PRIMARY_ROOM ORDER BY PAT_ENC_CSN_ID, QUARTER_START) 
+                                           AS ROW_NUMBER
+                                           FROM DEV_01_PROCESSED_UTILIZATION_TABLE
+                                           WHERE PRIMARY_ROOM = 1) a;
+                                           ")
+
+third_processed_utilization_drop <-glue("DROP TABLE DEV_03_PROCESSED_UTILIZATION_TABLE")
+third_processed_utilization_query <- glue("CREATE TABLE DEV_03_PROCESSED_UTILIZATION_TABLE AS
+                                           SELECT a.*,
+                                           CASE WHEN a.UPDATED_ROW_NUMBER = b.MIN_ROW_NUMBER THEN 1 ELSE NULL END AS FIRST_ENTERED_PRIMARY_ROOM
+                                           FROM
+                                           (SELECT * FROM DEV_02_PROCESSED_UTILIZATION_TABLE) a
+                                           LEFT JOIN
+                                           (SELECT ACTIVITY_DATE, PAT_ENC_CSN_ID, PRIMARY_ROOM, MIN(UPDATED_ROW_NUMBER) AS MIN_ROW_NUMBER
+                                           FROM DEV_02_PROCESSED_UTILIZATION_TABLE
+                                           GROUP BY ACTIVITY_DATE, PAT_ENC_CSN_ID, PRIMARY_ROOM) b
+                                           ON a.ACTIVITY_DATE = b.ACTIVITY_DATE AND
+                                           a.PAT_ENC_CSN_ID = b.PAT_ENC_CSN_ID AND
+                                           a.PRIMARY_ROOM = b.PRIMARY_ROOM;
+                                           ")
+
+
+final_processed_utilization_drop <-glue("DROP TABLE DEV_PROCESSED_UTILIZATION_TABLE")
+final_processed_utilization_query <- glue("CREATE TABLE DEV_PROCESSED_UTILIZATION_TABLE AS
+                                           SELECT f.*, e.FIRST_ENTERED_PRIMARY_ROOM,
+                                           CASE WHEN f.ACTIVITY_HOUR <12 THEN 'AM'
+                                                WHEN f.ACTIVITY_HOUR >= 12 AND f.ACTIVITY_HOUR < 17 THEN 'PM'
+                                                ELSE 'EVE'
+                                           END AS SESSION_TYPE
+                                           FROM
+                                           (SELECT * FROM DEV_01_PROCESSED_UTILIZATION_TABLE) f
+                                           LEFT JOIN
+                                           (SELECT c.*, d.FIRST_ENTERED_PRIMARY_ROOM
+                                           FROM
+                                           (SELECT a.*, b.UPDATED_ROW_NUMBER
+                                           FROM
+                                           (SELECT * FROM DEV_01_PROCESSED_UTILIZATION_TABLE) a
+                                           LEFT JOIN 
+                                           (SELECT * FROM DEV_02_PROCESSED_UTILIZATION_TABLE) b
+                                           ON a.ACTIVITY_DATE = b.ACTIVITY_DATE AND 
+                                              a.PAT_ENC_CSN_ID = b.PAT_ENC_CSN_ID AND
+                                              a.QUARTER_START = b.QUARTER_START AND
+                                              a.QUARTER_END = b.QUARTER_END AND
+                                              a.PRIMARY_ROOM = b.PRIMARY_ROOM) c
+                                           LEFT JOIN 
+                                           (SELECT * FROM DEV_03_PROCESSED_UTILIZATION_TABLE) d
+                                           ON c.ACTIVITY_DATE = d.ACTIVITY_DATE AND 
+                                              c.PAT_ENC_CSN_ID = d.PAT_ENC_CSN_ID AND
+                                              c.QUARTER_START = d.QUARTER_START AND
+                                              c.QUARTER_END = d.QUARTER_END AND
+                                              c.PRIMARY_ROOM = d.PRIMARY_ROOM AND
+                                              c.UPDATED_ROW_NUMBER = d.UPDATED_ROW_NUMBER) e
+                                              ON
+                                              f.ACTIVITY_DATE = e.ACTIVITY_DATE AND 
+                                              f.PAT_ENC_CSN_ID = e.PAT_ENC_CSN_ID AND
+                                              f.QUARTER_START = e.QUARTER_START AND
+                                              f.QUARTER_END = e.QUARTER_END AND
+                                              f.PRIMARY_ROOM = e.PRIMARY_ROOM;
+                                           ")
+
+
+
+## Turns by Primary & All Rooms ------------------------------
+## Calculate Utilization & Turns by Room, Date, and Hour --------------------
+
+room_utilization_drop <- glue("DROP TABLE DEV_ROOM_UTILIZATION_TABLE")
+room_utilization_query <- glue("CREATE TABLE DEV_ROOM_UTILIZATION_TABLE AS
+                               SELECT a.*
+                               FROM
+                               (SELECT SITE AS CAMPUS, BUILDING_ADDRESS, FLOOR_SUITE, DEPARTMENT_ID, DEPARTMENT_NAME, WORKSTN_IDENTIFIER,
+                               ROOM, TYPE_NAME, WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL, WORKSTN_NOTES, 
+                               SQR_FT, OUTOFSERVICE_OR_UNDERCONSTRUCTION, LEASE_START_DATE, LEASE_END_DATE, ASSIGN_START_DATE, ASSIGN_END_DATE,
+                               PROV_NAME_WID, PROV_TYPE_SCHEDULING,
+                               ACTIVITY_DATE, ACTIVITY_HOUR, SESSION_TYPE, ACTIVE_QUARTER, SUM(FIRST_ENTERED_PRIMARY_ROOM) AS TURNS_PRIMARY_ROOM,
+                               SUM(ROOM_MINUTES) AS ROOM_MINUTES
+                               FROM DEV_PROCESSED_UTILIZATION_TABLE
+                               GROUP BY 
+                               SITE, BUILDING_ADDRESS, FLOOR_SUITE, DEPARTMENT_ID, DEPARTMENT_NAME, WORKSTN_IDENTIFIER,
+                               ROOM, TYPE_NAME, WORKSTN_OWNER, LEASED_OR_OWNED, HOSPITAL_OR_NONHOSPITAL, WORKSTN_NOTES, 
+                               SQR_FT, OUTOFSERVICE_OR_UNDERCONSTRUCTION, LEASE_START_DATE, LEASE_END_DATE, ASSIGN_START_DATE, ASSIGN_END_DATE,
+                               PROV_NAME_WID, PROV_TYPE_SCHEDULING,
+                               ACTIVITY_DATE, ACTIVITY_HOUR, SESSION_TYPE, ACTIVE_QUARTER) a;
+                               ")
+
   
 ```
 
@@ -576,26 +407,27 @@ processed_utilization_query <-glue("CREATE TABLE PROCESSED_UTILIZATION_TABLE AS
 ## Calculating Room assignment value depanding on unique providers seeing unique patients
 room_assignment_drop <- glue("DROP TABLE ROOM_ASSIGNMENT_TABLE")
 room_assignment_query <- glue("CREATE TABLE ROOM_ASSIGNMENT_TABLE AS
-                              SELECT ACTIVITY_DATE, SESSION, WORKSTN_IDENTIFIER, 1/COUNT(DISTINCT COLLAPSE_NUM_PROVIDERS) AS ROOM_ASSIGNMENT_VALUE
+                              SELECT ACTIVITY_DATE, SESSION_TYPE, WORKSTN_IDENTIFIER, 1/COUNT(DISTINCT COLLAPSE_NUM_PROVIDERS) AS ROOM_ASSIGNMENT_VALUE
                               FROM
-                              (SELECT ACTIVITY_DATE, SESSION, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID, 
-                              GROUP_CONCAT(DISTINCT PROV_NAME_WID,',') AS COLLAPSE_NUM_PROVIDERS
-                              FROM UTILIZATION_DATA
-                              GROUP BY ACTIVITY_DATE, SESSION, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID)
-                              GROUP BY ACTIVITY_DATE, SESSION, WORKSTN_IDENTIFIER
+                              (SELECT ACTIVITY_DATE, SESSION_TYPE, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID, 
+                              LISTAGG(DISTINCT PROV_NAME_WID,',') AS COLLAPSE_NUM_PROVIDERS
+                              FROM DEV_PROCESSED_UTILIZATION_TABLE
+                              GROUP BY ACTIVITY_DATE, SESSION_TYPE, WORKSTN_IDENTIFIER, PAT_ENC_CSN_ID)
+                              GROUP BY ACTIVITY_DATE, SESSION_TYPE, WORKSTN_IDENTIFIER;
                              ")
 
 ## merging with room_utilization_table
 room_util_merged_drop <- glue("DROP TABLE ROOM_UTILIZATION_MERGED")
 room_util_merged_query <- glue("CREATE TABLE ROOM_UTILIZATION_MERGED AS
                                 SELECT a.*, b.ROOM_ASSIGNMENT_VALUE
-                                (SELECT * FROM ROOM_UTILIZATION_TABLE) a
+                                FROM
+                                (SELECT * FROM DEV_ROOM_UTILIZATION_TABLE) a
                                 LEFT JOIN
-                                (SELECT ACTIVITY_DATE, SESSION, WORKSTN_IDENTIFIER, ROOM_ASSIGNMENT_VALUE
-                                FROM ROOM_ASSIGNMENT TABLE) b
+                                (SELECT ACTIVITY_DATE, SESSION_TYPE, WORKSTN_IDENTIFIER, ROOM_ASSIGNMENT_VALUE
+                                FROM ROOM_ASSIGNMENT_TABLE) b
                                ON a.ACTIVITY_DATE = b.ACTIVITY_DATE AND
-                                  a.SESSION = b.SESSION AND
-                                  a.WORKSTN_IDENTIFIER = b.WORKSTN_IDENTIFIER
+                                  a.SESSION_TYPE = b.SESSION_TYPE AND
+                                  a.WORKSTN_IDENTIFIER = b.WORKSTN_IDENTIFIER;
                                ")
 
 ```
@@ -632,7 +464,7 @@ updated_workstn_owner_query <- glue("CREATE TABLE PROD_ROOM_UTILIZATION_TABLE AS
                                a.VISIT_TYPE,
                                b.WORKSTN_OWNER
                                FROM
-                              (SELECT * FROM ROOM_UTILIZATION_TABLE) a
+                              (SELECT * FROM ROOM_UTILIZATION_MERGED) a
                                LEFT JOIN 
                               (SELECT WORKSTN_IDENTIFIER, WORKSTN_OWNER, START_DATE, END_DATE FROM TEMP_WORKSTATION_MAPPING) b
                                ON a.WORKSTN_IDENTIFIER = b.WORKSTN_IDENTIFIER
@@ -651,35 +483,26 @@ updated_workstn_owner_query <- glue("CREATE TABLE PROD_ROOM_UTILIZATION_TABLE AS
 tryCatch({
   conn1 <- dbConnect(drv = odbc(), "OAO Cloud DB SoYoun", timeout = 30)
   dbBegin(conn1)
-#  if(dbExistsTable(conn1, "COMBINED_WORKSTATION_MAPPING")){
-#  dbExecute(conn1, workstation_drop) 
-#  }
-#  dbExecute(conn1, workstation_query) 
-#  if(dbExistsTable(conn1, "MODIFIED_WORKSTATION_MAPPING")){
-#    dbExecute(conn1, workstation_modified_drop) 
-#  }
-#  dbExecute(conn1, workstation_modified_query) 
-#  if(dbExistsTable(conn1, "WORKSTATION_MAPPING_SUBSET")){
-#    dbExecute(conn1, workstation_mapping_subset_drop) 
-#  }
-#    dbExecute(conn1, workstation_mapping_subset_query) 
-#   if(dbExistsTable(conn1, "USER_ACTIVITY_HOUR_TABLE")){
-#     dbExecute(conn1, user_activity_drop) 
-#   }
-#   dbExecute(conn1, user_activity_query)  
-#   if(dbExistsTable(conn1, "USER_ACTIVITY_HOUR_TABLE_TEST")){
-#     dbExecute(conn1, user_activity_drop_test) 
-#   }
-#   dbExecute(conn1, user_activity_query_test)    
-#   if(dbExistsTable(conn1, "UTILIZATION_TABLE")){
-#    dbExecute(conn1, utilization_drop) 
-#   }
-#   dbExecute(conn1, utilization_query) 
-#   if(dbExistsTable(conn1, "ACTIVE_MINUTES")){
-#    dbExecute(conn1, active_minutes_drop) 
-#   }
-#   dbExecute(conn1, active_minutes_query)    
-#   if(dbExistsTable(conn1, "MERGED_UTILIZATION_TABLE")){
+   if(dbExistsTable(conn1, "PROD_WORKSTATION_MAPPING")){
+   dbExecute(conn1, workstation_drop) 
+   }
+   if(dbExistsTable(conn1, "WORKSTATION_MAPPING_SUBSET")){
+     dbExecute(conn1, workstation_mapping_subset_drop) 
+   }
+     dbExecute(conn1, workstation_mapping_subset_query) 
+    if(dbExistsTable(conn1, "USER_ACTIVITY_HOUR_TABLE")){
+      dbExecute(conn1, user_activity_drop) 
+    }
+    dbExecute(conn1, user_activity_query)  
+    if(dbExistsTable(conn1, "DEV_UTILIZATION_TABLE")){
+     dbExecute(conn1, utilization_drop) 
+    }
+    dbExecute(conn1, utilization_query) 
+    if(dbExistsTable(conn1, "DEV_ACTIVE_MINUTES")){
+     dbExecute(conn1, active_minutes_drop) 
+    }
+     dbExecute(conn1, active_minutes_query)    
+#   if(dbExistsTable(conn1, "DEV_MERGED_UTILIZATION_TABLE")){
 #     dbExecute(conn1, merged_utilization_drop) 
 #   }
 #   dbExecute(conn1, merged_utilization_query)   
